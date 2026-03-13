@@ -1,0 +1,162 @@
+/* Card */
+
+.grant-coverage-card {
+  background: var(--body-color);
+  padding: 20px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+
+/* Mode Toggle */
+
+.mode-toggle {
+  display: flex;
+  gap: 30px;
+  align-items: center;
+  margin-top: 10px;
+}
+
+.mode-toggle label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.mode-toggle input[type='radio'] {
+  width: 18px;
+  height: 18px;
+}
+
+
+/* Counties Grid */
+
+.county-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 10px;
+  margin-top: 15px;
+}
+
+
+/* County Item */
+
+.county-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #f5f7fa;
+  padding: 6px 8px;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+
+/* Select All */
+
+.select-all-row {
+  margin-bottom: 10px;
+  display: flex;
+  justify-content: flex-start;
+}
+
+
+/* Chips */
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  background: #e6f0ff;
+  border-radius: 16px;
+  padding: 6px 10px;
+  margin: 4px;
+  font-size: 13px;
+}
+
+.chip .remove {
+  margin-left: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  color: red;
+}
+
+
+/* Buttons */
+
+.buttons {
+  display: flex;
+  justify-content: space-between;
+  padding-top: 20px;
+}
+
+.btn-save {
+  background-color: var(--nav-color);
+  color: #fff;
+  padding: 8px 18px;
+  border: none;
+  border-radius: 4px;
+}
+
+.btn-next {
+  background-color: var(--nav-color);
+  color: #fff;
+  padding: 8px 18px;
+  border: none;
+  border-radius: 4px;
+}
+
+
+/* Paste Modal */
+
+.paste-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+
+.paste-modal {
+  background: #fff;
+  width: 40%;
+  min-width: 320px;
+  max-width: 640px;
+  border-radius: 8px;
+  padding: 20px;
+}
+
+.paste-modal textarea {
+  width: 100%;
+  min-height: 150px;
+  padding: 10px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+}
+
+
+/* Responsive */
+
+@media (max-width: 992px) {
+
+  .county-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+}
+
+@media (max-width: 576px) {
+
+  .county-grid {
+    grid-template-columns: repeat(1, 1fr);
+  }
+
+  .mode-toggle {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+}

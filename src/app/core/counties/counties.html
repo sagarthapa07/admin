@@ -1,0 +1,75 @@
+<div class="row mt-4">
+  <div class="col-6">
+    <h5>Select States/Counties</h5>
+  </div>
+
+  <div class="col-6 d-flex justify-content-end">
+    <button class="btn border" (click)="openPasteModal()">Paste Here</button>
+  </div>
+</div>
+
+<hr />
+
+<div class="grant-coverage-card">
+  <h5>Select Grant Coverage</h5>
+
+  <div class="mode-toggle">
+    <label>
+      <input
+        type="radio"
+        name="grantMode"
+        [checked]="grantMode === 'single'"
+        (change)="setGrantMode('single')"
+      />
+
+      Single State
+    </label>
+
+    <label>
+      <input
+        type="radio"
+        name="grantMode"
+        [checked]="grantMode === 'multiple'"
+        (change)="setGrantMode('multiple')"
+      />
+
+      Multiple States
+    </label>
+
+    <label>
+      <input
+        type="radio"
+        name="grantMode"
+        [checked]="grantMode === 'all'"
+        (change)="setGrantMode('all')"
+      />
+
+      All States
+    </label>
+  </div>
+
+  <div *ngIf="grantMode === 'single'" class="mt-3">
+    <ng-multiselect-dropdown
+      [settings]="countieSettings"
+      [data]="countiesKeyDropDowns.states.data"
+      [(ngModel)]="countiesKeyDropDowns.states.selected"
+      (onSelect)="onSingleStateChange()"
+      (onDeSelect)="onSingleStateChange()"
+    >
+    </ng-multiselect-dropdown>
+
+    <div class="county-grid" *ngIf="activeStatesForCounties">
+      <label
+        class="county-item"
+        *ngFor="let county of countiySubCountyMap[activeStatesForCounties]"
+      >
+        <input
+          type="checkbox"
+          [checked]="selectedSubCounties[activeStatesForCounties]?.includes(county)"
+          (change)="toggleCounty(activeStatesForCounties, county, $event.target.checked)"
+        />
+        <span>{{ county }}</span>
+      </label>
+    </div>
+  </div>
+</div>

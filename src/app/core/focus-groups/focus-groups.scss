@@ -1,0 +1,63 @@
+/* Sub Grid */
+
+.sub-grid {
+  display: grid;
+  grid-template-columns: repeat(4,1fr);
+  gap: 10px 20px;
+  margin-top: 10px;
+}
+
+.sub-grid .sub-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #f5f7fa;
+  padding: 6px 8px;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+
+/* Entity Chips */
+
+.entity-chip {
+  font-weight: 600;
+}
+
+
+/* Chips */
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  background: #e9ecef;
+  padding: 6px 12px;
+  border-radius: 14px;
+  margin-bottom: 6px;
+}
+
+.remove {
+  margin-left: 6px;
+  cursor: pointer;
+  color: red;
+  font-weight: bold;
+}
+
+
+/* Responsive */
+
+@media (max-width: 992px) {
+
+  .sub-grid {
+    grid-template-columns: repeat(2,1fr);
+  }
+
+}
+
+@media (max-width: 576px) {
+
+  .sub-grid {
+    grid-template-columns: repeat(1,1fr);
+  }
+
+}

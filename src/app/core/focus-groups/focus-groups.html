@@ -1,0 +1,90 @@
+<div class="mt-4">
+  <h5>Select Focus Groups</h5>
+
+  <hr />
+
+  <div class="row">
+    <!-- Beneficiaries -->
+
+    <div class="col-md-4">
+      <label class="fw-semibold mb-1">
+        {{ focusGroupKeyDropdowns.beneficiaries.label }}
+      </label>
+
+      <ng-multiselect-dropdown
+        [settings]="multiSelectSettings"
+        [data]="focusGroupKeyDropdowns.beneficiaries.data"
+        [(ngModel)]="focusGroupKeyDropdowns.beneficiaries.selected"
+        (onSelect)="saveFocusGroup('beneficiaries')"
+        (onDeSelect)="saveFocusGroup('beneficiaries')"
+      >
+      </ng-multiselect-dropdown>
+
+      <div class="row mt-4">
+        <span class="chip" *ngFor="let b of savedBeneficiaries">
+          {{ b }}
+
+          <span class="remove" (click)="removeBeneficiary(b)"> × </span>
+        </span>
+      </div>
+    </div>
+
+    <!-- Entities -->
+
+    <div class="col-md-8">
+      <label class="fw-semibold mb-1">
+        {{ focusGroupKeyDropdowns.entities.label }}
+      </label>
+
+      <ng-multiselect-dropdown
+        [settings]="entitySettings"
+        [data]="focusGroupKeyDropdowns.entities.data"
+        [(ngModel)]="focusGroupKeyDropdowns.entities.selected"
+        (onSelect)="onEntityChange()"
+        (onDeSelect)="onEntityChange()"
+      >
+      </ng-multiselect-dropdown>
+
+      <div class="row mt-4" *ngIf="activeEntityForSubGrid">
+        <div class="col-12">
+          <h6>{{ activeEntityForSubGrid }}</h6>
+
+          <div class="sub-grid">
+            <label
+              class="sub-checkbox"
+              *ngFor="let sub of entitySubEntityMap[activeEntityForSubGrid]"
+            >
+              <input
+                type="checkbox"
+                [checked]="selectedSubEntities[activeEntityForSubGrid]?.includes(sub)"
+                (change)="toggleSubEntity(activeEntityForSubGrid, sub, $event.target.checked)"
+              />
+
+              <span>{{ sub }}</span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <div class="row mt-4">
+        <ng-container *ngFor="let entity of savedEntities">
+          <div class="col-md-3">
+            <span class="chip entity-chip">
+              {{ entity }}
+
+              <span class="remove" (click)="removeEntity(entity)"> × </span>
+            </span>
+          </div>
+
+          <div class="col-md-9">
+            <span class="chip" *ngFor="let sub of selectedSubEntities[entity]">
+              {{ sub }}
+
+              <span class="remove" (click)="removeSubEntity(entity, sub)"> × </span>
+            </span>
+          </div>
+        </ng-container>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,30 @@
+<app-header></app-header>
+
+
+<div class="row mb-1 header-section">
+
+    <div class="col-lg-6">
+      <h4>Calendar and Premium Newsletter (Add/Modify)</h4>
+    </div>
+  <div class=" col-lg-6 header-btn">
+    <button
+      class="btn"
+      *ngFor="let item of menuItems"
+      [class.active]="activeItem === item"
+      (click)="setActive(item)"
+    >
+      {{ item }}
+    </button>
+  </div>
+</div>
+<app-calendar-details *ngIf="activeItem === 'Calendar Details'"></app-calendar-details>
+
+<app-geo-location *ngIf="activeItem === 'Geo Location'"></app-geo-location>
+
+<app-focus-areas *ngIf="activeItem === 'Focus Areas'"></app-focus-areas>
+
+<app-focus-groups *ngIf="activeItem === 'Focus Groups'"></app-focus-groups>
+
+<app-counties *ngIf="activeItem === 'Counties'"></app-counties>
+
+<app-seo-social *ngIf="activeItem === 'Seo/Social Media'"></app-seo-social> 

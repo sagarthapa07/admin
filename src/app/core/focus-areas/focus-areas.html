@@ -1,0 +1,65 @@
+<div class="row mt-4">
+  <div class="col-6">
+    <h5>Select Focus Areas</h5>
+  </div>
+
+  <div class="col-6 d-flex justify-content-end">
+    <button class="btn border" (click)="openPasteModal()">Paste Here</button>
+  </div>
+</div>
+
+<hr />
+
+<div class="issue-grid" #issueContainer>
+  <div
+    class="issue-box"
+    *ngFor="let issue of issues"
+    (mouseenter)="onHoverIssue(issue)"
+    (mouseleave)="onLeaveIssue()"
+    (click)="onClickIssue(issue)"
+  >
+    <span class="issue-dot" [class.active]="hasAnySelected(issue)"> </span>
+
+    <span class="issue-text">
+      {{ issue.name }}
+    </span>
+
+    <div class="subissue-popover" *ngIf="activeIssue?.id === issue.id">
+      <div class="popup-header">
+        {{ issue.name }}
+      </div>
+
+      <div class="popup-body">
+        <div class="subissue-grid">
+          <label class="sub-checkbox" *ngFor="let sub of issue.subIssues">
+            <input
+              type="checkbox"
+              [checked]="isSubSelected(issue, sub)"
+              (change)="toggleSub(issue, sub)"
+            />
+
+            <span>{{ sub.name }}</span>
+          </label>
+        </div>
+      </div>
+
+      <div class="popup-select-all">
+        <label class="sub-checkbox">
+          <input
+            type="checkbox"
+            [checked]="isAllSelected(issue)"
+            (change)="toggleSelectAll(issue)"
+          />
+
+          <span>Select All</span>
+        </label>
+      </div>
+
+      <div class="popup-footer">
+        <button class="btn-remove" (click)="clearIssue(issue.id)">Remove</button>
+
+        <button class="btn-done" (click)="saveSelectedIssues()">Done</button>
+      </div>
+    </div>
+  </div>
+</div>

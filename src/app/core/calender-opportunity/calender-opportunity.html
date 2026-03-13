@@ -1,0 +1,181 @@
+<app-header></app-header>
+
+<section class="header-section">
+  <div class="heading">
+    <span>Calendar Opportunity</span>
+  </div>
+  <div class="header-sec">
+    <div class="header-row">
+      <!-- LEFT COLUMN -->
+      <div class="header-left">
+        <div class="search-box">
+          <i class="fa-solid fa-magnifying-glass icons"></i>
+          <input type="text" placeholder="Search" [(ngModel)]="searchText" />
+        </div>
+
+        <button class="filter-btn">
+          <i class="bi bi-funnel mx-1"></i>
+          <span>Filter</span>
+        </button>
+      </div>
+
+      <!-- RIGHT COLUMN -->
+      <div class="header-right">
+        <div class="date-range-wrapper position-relative">
+          <div class="input-group range-input" (click)="toggle()">
+            <input
+              class="form-control"
+              readonly
+              [value]="displayValue"
+              placeholder="Select date range"
+            />
+            <button class="btn calendar-btn" type="button">
+              <i class="bi bi-calendar3"></i>
+            </button>
+          </div>
+
+          @if (open) {
+          <div class="calendar-popup">
+            <div class="d-flex gap-3">
+              <ngb-datepicker
+                [(ngModel)]="fromDate"
+                (dateSelect)="onFromSelect($event)"
+                [navigation]="'select'"
+              ></ngb-datepicker>
+
+              <ngb-datepicker
+                [(ngModel)]="toDate"
+                (dateSelect)="onToSelect($event)"
+                [navigation]="'select'"
+                [minDate]="minToDate!"
+              ></ngb-datepicker>
+            </div>
+          </div>
+          }
+        </div>
+        <div>
+          <button class="btn filter-btn">
+            <!-- <i class="fa-light fa-file-export"></i> -->
+            <i class="bi bi-file-arrow-down"></i>
+            <span>Export</span>
+          </button>
+        </div>
+
+        <div style="margin-right: 20px">
+          <button class="btn filter-btn w-100" routerLink="/edit">
+            <i class="fa-solid fa-plus"></i>
+            Add New
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <br />
+
+  <div class="table-wrapper border">
+    <div class="table-responsive">
+      <table class="custom-table">
+        <thead>
+          <tr>
+            <th>
+              <label class="custom-checkbox">
+                <input type="checkbox" />
+                <span class="checkmark"></span>
+              </label>
+            </th>
+            <th>Opportunity</th>
+            <th>Post Date</th>
+            <th>Deadline</th>
+            <th>View</th>
+            <th>Status</th>
+            <th>Edit</th>
+            <th>Copy</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr>
+            <td>
+              <label class="custom-checkbox">
+                <input type="checkbox" />
+                <span class="checkmark"></span>
+              </label>
+            </td>
+            <td class="id-text">Healthcare Foundation Community Grants (Florida)</td>
+            <td>12 Oct 2024</td>
+            <td>18 Jan 2025</td>
+            <td>0</td>
+            <td><span class="status paid">Published</span></td>
+            <td class="icon-cell" routerLink="/edit"><i class="bi bi-pencil-square"></i></td>
+            <td class="icon-cell"><i class="bi bi-copy"></i></td>
+          </tr>
+
+          <tr>
+            <td>
+              <label class="custom-checkbox">
+                <input type="checkbox" />
+                <span class="checkmark"></span>
+              </label>
+            </td>
+            <td class="id-text">Essex County Community Response Fund 2026 (Massachusetts)</td>
+            <td>30 Nov 2024</td>
+            <td>25 Jan 2026</td>
+            <td>1</td>
+            <td><span class="status pending">Draft</span></td>
+            <td class="icon-cell" routerLink="/edit"><i class="bi bi-pencil-square"></i></td>
+            <td class="icon-cell"><i class="bi bi-copy"></i></td>
+          </tr>
+
+          <tr>
+            <td>
+              <label class="custom-checkbox">
+                <input type="checkbox" />
+                <span class="checkmark"></span>
+              </label>
+            </td>
+            <td class="id-text">County Arts Development Grant Program 2026 (Maryland)</td>
+            <td>15 Nov 2024</td>
+            <td>12 Feb 2025</td>
+            <td>8</td>
+            <td><span class="status pending">Draft</span></td>
+            <td class="icon-cell" routerLink="/edit"><i class="bi bi-pencil-square"></i></td>
+            <td class="icon-cell"><i class="bi bi-copy"></i></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="footer-section">
+    <div class="footer-left">
+      <span>Row Per Page</span>
+
+      <select class="page-select">
+        <option>10</option>
+        <option>20</option>
+        <option>50</option>
+      </select>
+
+      <span>Entries</span>
+    </div>
+
+    <!-- RIGHT -->
+    <div class="footer-right">
+      <button class="page-btn disabled">‹</button>
+      <button class="page-btn active">1</button>
+      <button class="page-btn">2</button>
+      <button class="page-btn">›</button>
+    </div>
+  </div>
+</section>
+
+<!-- <div ngbDropdown class="d-inline-block">
+  <button type="button" class="btn btn-outline-primary" id="dropdownBasic1" ngbDropdownToggle>
+    Toggle dropdown
+  </button>
+  <div ngbDropdownMenu aria-labelledby="dropdownBasic1">
+    <button ngbDropdownItem>Action - 1</button>
+    <button ngbDropdownItem>Another Action</button>
+    <button ngbDropdownItem>Something else is here</button>
+  </div>
+</div> -->

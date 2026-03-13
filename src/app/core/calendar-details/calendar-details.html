@@ -1,0 +1,137 @@
+
+<h1>Lorem ipsum dolor sit amet consectetur adipisicing elit. Minima aliquid minus ratione iusto? Dignissimos tenetur repellendus, ratione similique cupiditate ea?</h1>
+
+<div>
+  <form [formGroup]="opportunityForm" (ngSubmit)="onSave()">
+    <div class="row mt-5">
+      <!-- LEFT FORM -->
+      <div class="col-md-6">
+        <h5 class="section-title">Opportunity Detail</h5>
+        <hr />
+
+        <div class="form-group">
+          <label>Title:</label>
+          <input type="text" class="form-control" formControlName="title" />
+        </div>
+
+        <div class="form-group">
+          <label>Link URL:</label>
+          <input type="text" class="form-control" formControlName="linkUrl" />
+        </div>
+
+        <div class="form-group">
+          <label>Post Date:</label>
+          <input type="date" class="form-control date-input" formControlName="postDate" />
+        </div>
+
+        <div class="form-group deadline-group">
+          <label>Deadline Date:</label>
+
+          <input type="date" class="form-control date-input" formControlName="deadlineDate" />
+
+          <div class="form-check ongoing-box">
+            <input type="checkbox" class="form-check-input" formControlName="isOngoing" />
+
+            <label class="form-check-label"> OnGoing Opportunity </label>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Short Info:</label>
+
+          <textarea rows="3" class="form-control" formControlName="shortInfo"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>Donor Type:</label>
+
+          <select class="form-control" formControlName="donorType">
+            <option value="US Donors">US Donors</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Donor Agency:</label>
+
+          <input type="text" class="form-control" formControlName="donorAgency" />
+        </div>
+
+        <div class="form-group">
+          <label>Donor Agency (if not listed above):</label>
+
+          <input type="text" class="form-control" formControlName="donorAgencyOther" />
+        </div>
+
+        <div class="form-group">
+          <label>Grant Type:</label>
+
+          <select class="form-control" formControlName="grantType">
+            <option>Awards and Prizes</option>
+            <option>Fellowship</option>
+            <option>Grant</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Grant Duration:</label>
+
+          <select class="form-control" formControlName="grantDuration">
+            <option>Less than 1 Year</option>
+            <option>1 Year</option>
+            <option>2 Year</option>
+            <option>3 Year</option>
+            <option>4 Year</option>
+            <option>5 Year</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Grant Size:</label>
+
+          <select class="form-control" formControlName="grantSize">
+            <option>Not Available</option>
+            <option>Under $10,000</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Image:</label>
+          <input type="file" class="form-control" />
+        </div>
+
+        <div class="form-group">
+          <label>Status:</label>
+
+          <select class="form-control" formControlName="status">
+            <option>Draft</option>
+            <option>Published</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- RIGHT SIDE -->
+      <div class="col-md-6">
+        <h5 class="section-title">Letter Text</h5>
+
+        <hr />
+
+        <label><b>Description</b></label>
+
+        <ckeditor [editor]="Editor" [(ngModel)]="editorData"> </ckeditor>
+      </div>
+
+      <!-- BUTTONS -->
+      <div class="buttons d-flex justify-content-between">
+        <div>
+          <button type="submit" class="btn btn-save">Preview</button>
+        </div>
+
+        <div>
+          <button type="submit" class="btn btn-save mx-2">Save</button>
+
+          <button type="button" class="btn btn-next">Next</button>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>

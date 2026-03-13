@@ -1,0 +1,50 @@
+/* Header Button Section */
+
+.header-btn {
+  display: flex;
+  justify-content: flex-end;
+  gap: 5px;
+}
+
+.header-btn .btn {
+  font-size: var(--fs-14);
+  font-weight: var(--fw-400);
+  height: 37px;
+  padding: 0 14px;
+  border-radius: 5px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.header-btn .btn:hover {
+  color: var(--primary-color);
+}
+
+.header-btn .btn.active {
+  background: var(--btn-bg-color);
+  border-color: var(--btn-bg-color);
+  color: var(--primary-color);
+  font-weight: var(--fw-500);
+}
+
+/* Responsive */
+
+@media (max-width: 768px) {
+
+  .header-btn {
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    margin-top: 10px;
+  }
+
+  .header-btn .btn {
+    font-size: 13px;
+    padding: 6px 10px;
+  }
+
+}

@@ -1,0 +1,12 @@
+<div style="margin: 20px;">
+  <label><b>Description</b></label>
+  <ckeditor
+    [editor]="Editor"
+    [config]="config"
+    [(ngModel)]="editorData">
+  </ckeditor>
+
+  <hr>
+  <h4>Output HTML:</h4>
+  <pre>{{ editorData }}</pre>
+</div>

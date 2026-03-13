@@ -1,0 +1,179 @@
+/* Issue Grid */
+
+.issue-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px 30px;
+}
+
+/* Issue Box */
+
+.issue-box {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 4px 2px;
+  cursor: pointer;
+}
+
+/* Dot */
+
+.issue-dot {
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  background: #9ca3af;
+  flex-shrink: 0;
+  transition: background 0.2s ease;
+}
+
+.issue-dot.active {
+  background: var(--primary-color);
+}
+
+/* Issue Text */
+
+.issue-text {
+  font-size: var(--body-text);
+  color: var(--text-color);
+}
+
+.issue-box:hover .issue-text {
+  color: var(--primary-color);
+}
+
+.issue-box:hover .issue-dot {
+  background: var(--primary-color);
+}
+
+
+/* Popover */
+
+.subissue-popover {
+  position: absolute;
+  top: 28px;
+  left: 0;
+  width: 420px;
+  max-width: 90vw;
+  background: #fff;
+  border-radius: 6px;
+  border: 1px solid #d1d5db;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+  z-index: 50;
+}
+
+
+/* Header */
+
+.popup-header {
+  padding: 12px 16px;
+  font-weight: 600;
+  color: #0284c7;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+
+/* Body */
+
+.popup-body {
+  padding: 14px 16px;
+}
+
+.subissue-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px,1fr));
+  gap: 8px 16px;
+}
+
+
+/* Checkbox */
+
+.sub-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+.sub-checkbox input {
+  accent-color: #0284c7;
+}
+
+
+/* Footer */
+
+.popup-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 12px 16px;
+  border-top: 1px solid #e5e7eb;
+}
+
+
+/* Buttons */
+
+.btn-remove {
+  background: #f3f4f6;
+  border: 1px solid #d1d5db;
+  padding: 6px 14px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.btn-done {
+  background: #0284c7;
+  color: #fff;
+  padding: 6px 16px;
+  border-radius: 4px;
+  border: none;
+  cursor: pointer;
+}
+
+
+/* Chips */
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--primary-color);
+  color: var(--text-color);
+  padding: 6px 10px;
+  border-radius: 16px;
+  font-size: 13px;
+  margin: 4px 6px 4px 0;
+}
+
+.remove {
+  cursor: pointer;
+  color: var(--danger-color);
+  font-weight: bold;
+}
+
+
+/* Responsive */
+
+@media (max-width: 992px) {
+
+  .issue-grid {
+    grid-template-columns: repeat(2,1fr);
+  }
+
+}
+
+@media (max-width: 576px) {
+
+  .issue-grid {
+    grid-template-columns: repeat(1,1fr);
+  }
+
+  .subissue-popover {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%,-50%);
+  }
+
+}
