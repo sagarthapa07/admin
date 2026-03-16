@@ -4,7 +4,7 @@ import { Dashboard } from './core/dashboard/dashboard';
 import { CalenderOpportunity } from './core/calender-opportunity/calender-opportunity';
 import { Edit } from './core/edit/edit';
 import { ForgetPass } from './auth/forget-pass/forget-pass';
-import { CalendarDetails } from './core/calendar-details/calendar-details';
+
 
 export const routes: Routes = [
   { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
@@ -28,8 +28,5 @@ export const routes: Routes = [
     path: 'forget',
     component: ForgetPass,
   },
-  {
-    path: 'calender -details',
-    component: CalendarDetails,
-  },
+
 ];
