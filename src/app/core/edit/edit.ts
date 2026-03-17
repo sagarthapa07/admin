@@ -2,12 +2,14 @@ import { Component, OnInit, HostListener, ElementRef, ViewChild, Inject } from '
 import { Header } from '../../shared/component/header/header';
 import { CommonModule, NgClass, isPlatformBrowser } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, FormsModule } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { IDropdownSettings, NgMultiSelectDropDownModule } from 'ng-multiselect-dropdown';
 import { ISSUES, Issue, SubIssue } from '../edit/issues.data';
 import { STATES_DATA } from '../edit/issues.data';
 import { CKEditorModule } from '@ckeditor/ckeditor5-angular';
 import { PLATFORM_ID } from '@angular/core';
+import { Preview } from '../Services/preview';
+
 interface Option {
   label: string;
   selected: boolean;
@@ -90,23 +92,6 @@ const DOCUMENT_ID = '<YOUR_DOCUMENT_ID>';
 const CLOUD_SERVICES_TOKEN_URL =
   'https://ghkxwoq5q2i3.cke-cs.com/token/dev/a66de728e4b8fd2c64baa41ae41bd6db4f8460341372281942d9edd273ce?limit=10';
 
-const DEFAULT_HEX_COLORS = [
-  { color: '#000000', label: 'Black' },
-  { color: '#4D4D4D', label: 'Dim grey' },
-  { color: '#999999', label: 'Grey' },
-  { color: '#E6E6E6', label: 'Light grey' },
-  { color: '#FFFFFF', label: 'White', hasBorder: true },
-  { color: '#E65C5C', label: 'Red' },
-  { color: '#E69C5C', label: 'Orange' },
-  { color: '#E6E65C', label: 'Yellow' },
-  { color: '#C2E65C', label: 'Light green' },
-  { color: '#5CE65C', label: 'Green' },
-  { color: '#5CE6A6', label: 'Aquamarine' },
-  { color: '#5CE6E6', label: 'Turquoise' },
-  { color: '#5CA6E6', label: 'Light blue' },
-  { color: '#5C5CE6', label: 'Blue' },
-  { color: '#A65CE6', label: 'Purple' },
-];
 
 @Component({
   standalone: true,
@@ -161,6 +146,8 @@ export class Edit implements OnInit {
     private changeDetector: ChangeDetectorRef,
     private fb: FormBuilder,
     private route: ActivatedRoute,
+    private router: Router,
+    private previewService: Preview,
     @Inject(PLATFORM_ID) private platformId: Object,
   ) {
     this.opportunityForm = this.fb.group({
@@ -195,9 +182,16 @@ export class Edit implements OnInit {
 
   onSave() {
     console.log('Save clicked', this.opportunityForm.value);
+
   }
 
-  menuItems = [
+  gotoPreview(){
+    this.router.navigate(['/preview'])
+  }
+
+
+  
+  menuItems = [ 
     'Calender Details',
     'Geo Location',
     'Focus Areas',
@@ -321,7 +315,6 @@ export class Edit implements OnInit {
 
   public Editor = ClassicEditor;
   public editorData = '';
-
   public config: EditorConfig = {
     licenseKey: 'GPL',
 
@@ -385,36 +378,19 @@ export class Edit implements OnInit {
     toolbar: {
       shouldNotGroupWhenFull: true,
       items: [
+        // ROW 1
         'undo',
         'redo',
         '|',
         'heading',
-        '|',
         'style',
-        '|',
-        'findAndReplace',
         '|',
         'bold',
         'italic',
         'underline',
         '|',
         'link',
-        '-',
         'alignment',
-        '|',
-        'removeFormat',
-        '|',
-        'specialCharacters',
-        '|',
-        'blockQuote',
-        '|',
-        'fontColor',
-        'fontBackgroundColor',
-        '|',
-        'highlight',
-        '|',
-        'fontSize',
-        'fontFamily',
         '|',
         'bulletedList',
         'numberedList',
@@ -422,20 +398,28 @@ export class Edit implements OnInit {
         '|',
         'outdent',
         'indent',
-        '-',
-        'insertImage',
-        'imageInsert',
+        'fontSize',
+        'fontFamily',
+
+        '-', //New line k liye use hoti h ye
+
+        //ROW 2
+
+        'fontColor',
+        'fontBackgroundColor',
+        '|',
+        'highlight',
+        '|',
+        'blockQuote',
         '|',
         'insertTable',
-        '|',
+        'imageInsert',
         'mediaEmbed',
         '|',
         'horizontalLine',
-        '|',
         'pageBreak',
         '|',
         'sourceEditing',
-        '|',
         'code',
         'codeBlock',
       ],

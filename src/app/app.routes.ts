@@ -4,6 +4,7 @@ import { Dashboard } from './core/dashboard/dashboard';
 import { CalenderOpportunity } from './core/calender-opportunity/calender-opportunity';
 import { Edit } from './core/edit/edit';
 import { ForgetPass } from './auth/forget-pass/forget-pass';
+import { Preview } from './core/preview/preview';
 
 
 export const routes: Routes = [
@@ -27,6 +28,10 @@ export const routes: Routes = [
   {
     path: 'forget',
     component: ForgetPass,
+  },
+  {
+    path: 'preview',
+    component: Preview,
   },
 
 ];

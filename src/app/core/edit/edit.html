@@ -173,30 +173,17 @@
         <div class="col-md-6">
           <h5 class="section-title">Letter Text</h5>
           <hr />
-
-          <!-- Replace with CKEditor later -->
-
-            <div
-              class="editor-container editor-container_classic-editor editor-container_include-outline editor-container_include-word-count"
-              #editorContainerElement
-            >
-              <div class="editor-container__editor-wrapper">
-                <div class="editor-container__sidebar" #editorOutlineElement></div>
-                <div class="editor-container__editor">
-                  <div #editorElement>
-                    <div>
-                      <ckeditor [editor]="Editor" [config]="config" formControlName="letterText">
-                      </ckeditor>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
+          <ckeditor [editor]="Editor" [config]="config" formControlName="letterText"> </ckeditor>
         </div>
+
+
+
+
+
+
         <div class="buttons d-flex justify-content-between">
           <div>
-            <button type="submit" class="btn btn-save"><i class="bi bi-eye"></i>Preview</button>
+            <button type="submit" class="btn btn-save" (click)="gotoPreview()"><i class="bi bi-eye"></i>Preview</button>
           </div>
           <div>
             <button type="submit" class="btn btn-save mx-2">
@@ -682,14 +669,6 @@
                 </div>
               </div>
             </div>
-
-            <!-- SAVE BUTTON -->
-            <div class="row mt-2">
-              <div class="col-md-6 col-12">
-                <button class="btn btn-primary mt-2" (click)="saveSingleSelection()">Save</button>
-              </div>
-            </div>
-
             <!-- SUB GRID -->
             <div
               class="row"
@@ -795,14 +774,6 @@
                 </div>
               </div>
             </div>
-
-            <!-- SAVE BUTTON -->
-            <div class="row mt-2">
-              <div class="col-md-6 col-12">
-                <button class="btn btn-primary mt-2" (click)="saveMultipleSelection()">Save</button>
-              </div>
-            </div>
-
             <!-- RECENTLY SELECTED STATE GRID -->
             <div *ngIf="multipleActiveState">
               <div class="row">

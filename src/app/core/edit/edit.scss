@@ -93,11 +93,15 @@ select.form-control {
 /* Label default */
 .ongoing-box .form-check-label {
   font-size: var(--body-text);
-  color: #374151;
+  color: var(--text-color);
   transition: color 0.2s ease;
   // width:auto;
 }
 
+
+.form-check-input:checked {
+    background-color: var(--nav-color);
+}
 /* Checkbox pointer */
 .ongoing-box input {
   cursor: pointer;
@@ -154,13 +158,9 @@ select.form-control {
   transition: background-color 0.2s ease-in-out;
 }
 
-/* Save Button */
-.btn-save {
-  background-color: var(--nav-color);
-}
-
 .btn-save:hover {
   background-color: #206898;
+  border-color: none;
 }
 
 /* Back Button */
@@ -281,7 +281,7 @@ label {
 }
 
 .btn-save {
-  background: #2a9fd6;
+  background: var(--nav-color);
   color: #fff;
   border: none;
   padding: 8px 20px;
@@ -1105,24 +1105,34 @@ input:checked+.slider:before {
   font-weight: bold;
 }
 
+/* CKEditor full width */
+::ng-deep .ck.ck-editor {
+  width: 100% !important;
+}
 
+/* Toolbar styling */
+::ng-deep .ck-toolbar {
+  border-radius: 6px 6px 0 0 !important;
+}
 
-.editor-container{
+/* Editor area */
+::ng-deep .ck-editor__editable_inline {
+  min-height: 578px;
+  max-height: 578px;
+  overflow-y: auto;
+  border-radius: 0 0 6px 6px !important;
+}
+
+::ng-deep .ck.ck-toolbar {
+  flex-wrap: wrap !important;
+}
+
+::ng-deep .ck.ck-toolbar__items {
+  display: flex !important;
+  flex-wrap: wrap !important;
   width: 100%;
-  border:1px solid #c70000;
-  border-radius:6px;
-  overflow:hidden;
 }
 
-::ng-deep .ck.ck-editor{
-  width:100%;
-}
-
-::ng-deep .ck-editor__editable_inline{
-  min-height:542px;
-}
-
-::ng-deep .ck-button .ck-icon{
-  width:18px;
-  height:18px;
+::ng-deep .ck.ck-toolbar__items > * {
+  margin-bottom: 5px;
 }
