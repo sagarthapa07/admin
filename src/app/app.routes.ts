@@ -5,6 +5,7 @@ import { CalenderOpportunity } from './core/calender-opportunity/calender-opport
 import { Edit } from './core/edit/edit';
 import { ForgetPass } from './auth/forget-pass/forget-pass';
 import { Preview } from './core/preview/preview';
+import { CalendarDetails } from './core/calendar-details/calendar-details';
 
 
 export const routes: Routes = [
@@ -32,6 +33,10 @@ export const routes: Routes = [
   {
     path: 'preview',
     component: Preview,
+  },
+  {
+    path: 'calendar-details',
+    component: CalendarDetails,
   },
 
 ];

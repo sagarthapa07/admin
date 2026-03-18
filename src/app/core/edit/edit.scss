@@ -792,7 +792,6 @@ input:checked+.slider:before {
   align-items: center;
   gap: 6px;
   padding: 6px 8px;
-  background: #f5f7fa;
   border-radius: 6px;
   font-size: 14px;
 }
@@ -962,17 +961,14 @@ input:checked+.slider:before {
 /* COUNTIES GRID */
 .county-grid {
   display: grid;
-
   grid-template-columns: repeat(5, 1fr);
-
   gap: 10px;
 }
 
 /* COUNTY ITEM */
 .county-item {
   display: flex;
-  align-items: center;
-  background: #f5f7fa;
+  align-items: center;  
   padding: 6px 8px;
   border-radius: 6px;
   font-size: 14px;
@@ -1091,7 +1087,7 @@ input:checked+.slider:before {
 .chip {
   display: inline-flex;
   align-items: center;
-  background: #d6dbe0;
+  background: var(--box-bg-color);
   padding: 6px 12px;
   border-radius: 18px;
   margin: 5px;

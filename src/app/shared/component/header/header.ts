@@ -7,12 +7,11 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 @Component({
   selector: 'app-header',
   standalone: true,
-  imports: [CommonModule, NgbCollapseModule, RouterModule,FontAwesomeModule],
+  imports: [CommonModule, NgbCollapseModule, RouterModule, FontAwesomeModule],
   templateUrl: './header.html',
   styleUrl: './header.scss',
 })
 export class Header {
-
   isCollapsed = true;
   isSidebarClosed = true;
 
@@ -35,5 +34,8 @@ export class Header {
 
   isOpen(key: string): boolean {
     return this.activeCollapse === key;
+  }
+  closeAllMenus() {
+    this.activeCollapse = null;
   }
 }

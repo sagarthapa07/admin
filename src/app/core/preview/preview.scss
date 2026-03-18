@@ -5,18 +5,18 @@
   background: var(--sidebar-color);
 }
 
-/* LEFT */
+
 .left {
   flex: 3;
 }
 
-/* RIGHT */
+
 .right {
   flex: 1;
   margin-right: 10px;
 }
 
-/* TOP CARD */
+
 .top-card {
   background: #fff;
   border: 1px solid #d1d5db;
@@ -52,7 +52,7 @@
   padding-bottom: 5px;
 }
 
-/* ALERT */
+
 .alert-box {
   background: #dc3545;
   color: white;
@@ -60,7 +60,7 @@
   margin-top: 15px;
 }
 
-/* CONTENT */
+
 .content-card {
   background: #fff;
   padding: 15px;
@@ -73,7 +73,7 @@
   line-height: 1.7;
 }
 
-/* SIDEBAR */
+
 .side-box {
   background: #fff;
   border: 1px solid #d1d5db;
@@ -100,7 +100,7 @@
 }
 
 .chip {
-  background: #e5e7eb;
+  background: var(--box-bg-color);
   padding: 5px 10px;
   border-radius: 20px;
   font-size: 13px;

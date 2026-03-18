@@ -2,6 +2,30 @@
     display: flex;
 }
 
+.logo {
+  position: absolute;
+  transition: opacity 0.3s ease;
+}
+
+/* Default (sidebar chhota) */
+.small-logo {
+  opacity: 1;
+}
+
+.big-logo {
+  opacity: 0;
+}
+
+/* Jab sidebar hover (expand) */
+.sidebar:hover .small-logo {
+  opacity: 0;
+}
+
+.sidebar:hover .big-logo {
+  opacity: 1;
+}
+
+
 .sidebar {
     position: fixed;
     top: 0;
