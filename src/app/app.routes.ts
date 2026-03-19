@@ -6,7 +6,9 @@ import { Edit } from './core/edit/edit';
 import { ForgetPass } from './auth/forget-pass/forget-pass';
 import { Preview } from './core/preview/preview';
 import { CalendarDetails } from './core/calendar-details/calendar-details';
-
+import { GeoLocationComponent } from './core/geo-location/geo-location';
+import { FocusAreaComponent } from './core/focus-areas/focus-areas';
+import { FocusGroupsComponent } from './core/focus-groups/focus-groups';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
@@ -38,5 +40,16 @@ export const routes: Routes = [
     path: 'calendar-details',
     component: CalendarDetails,
   },
-
+  {
+    path: 'geo-location',
+    component: GeoLocationComponent,
+  },
+  {
+    path: 'focus-area',
+    component: FocusAreaComponent,
+  },
+  {
+    path: 'focus-group',
+    component: FocusGroupsComponent,
+  },
 ];

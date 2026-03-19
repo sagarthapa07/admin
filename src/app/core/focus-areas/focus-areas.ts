@@ -1,47 +1,53 @@
-import { Component, ElementRef, HostListener, ViewChild } from '@angular/core';
+import { Component, OnInit, HostListener, ElementRef, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import { ISSUES, Issue, SubIssue } from '../edit/issues.data';
 
 @Component({
-  selector: 'app-focus-areas',
+  selector: 'app-focus-area',
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './focus-areas.html',
   styleUrl: './focus-areas.scss',
 })
-export class FocusAreasComponent {
+export class FocusAreaComponent implements OnInit {
   @ViewChild('issueContainer') issueContainer!: ElementRef;
 
   issues: Issue[] = ISSUES;
 
   activeIssue: Issue | null = null;
-
   hoverTimer: any = null;
 
   selectedMap = new Map<number, number[]>();
 
   showPasteModal = false;
-
   pasteText = '';
 
+  constructor(private router: Router) {}
+
+  ngOnInit(): void {}
+
+  // 👇 outside click close popup
   @HostListener('document:click', ['$event'])
   handleOutsideClick(event: MouseEvent) {
     if (!this.issueContainer) return;
 
     const clickedInside = this.issueContainer.nativeElement.contains(event.target);
 
-    if (!clickedInside && this.activeIssue !== null) {
-      setTimeout(() => {
-        this.activeIssue = null;
-      });
+    if (!clickedInside) {
+      this.activeIssue = null;
     }
   }
+
+  // ========================
+  // HOVER + CLICK
+  // ========================
 
   onHoverIssue(issue: Issue) {
     this.hoverTimer = setTimeout(() => {
       this.activeIssue = issue;
-    }, 2000);
+    }, 500);
   }
 
   onLeaveIssue() {
@@ -50,9 +56,12 @@ export class FocusAreasComponent {
 
   onClickIssue(issue: Issue) {
     clearTimeout(this.hoverTimer);
-
     this.activeIssue = issue;
   }
+
+  // ========================
+  // SUB ISSUE LOGIC
+  // ========================
 
   toggleSub(issue: Issue, sub: SubIssue) {
     const selected = this.selectedMap.get(issue.id) || [];
@@ -73,7 +82,6 @@ export class FocusAreasComponent {
 
   toggleSelectAll(issue: Issue) {
     const allIds = issue.subIssues.map((s) => s.id);
-
     const selected = this.selectedMap.get(issue.id) || [];
 
     if (selected.length === allIds.length) {
@@ -94,10 +102,51 @@ export class FocusAreasComponent {
       this.activeIssue = null;
     }
   }
+  hasAnySelected(issue: Issue): boolean {
+    return (this.selectedMap.get(issue.id)?.length || 0) > 0;
+  }
+
+  // ========================
+  // SAVE (GLOBAL)
+  // ========================
+
+  saveSelectedIssues() {
+    const result: any = {};
+
+    this.issues.forEach((issue) => {
+      const selectedSubIds = this.selectedMap.get(issue.id) || [];
+
+      if (selectedSubIds.length > 0) {
+        result[issue.name] = issue.subIssues
+          .filter((sub) => selectedSubIds.includes(sub.id))
+          .map((sub) => sub.name);
+      }
+    });
+
+    console.log('FOCUS AREA DATA:', result);
+
+    this.activeIssue = null;
+  }
+
+  // ========================
+  // SUMMARY
+  // ========================
+
+  get selectedEntries() {
+    return Array.from(this.selectedMap.entries());
+  }
+
+  getIssueName(issueId: number): string {
+    return this.issues.find((i) => i.id === issueId)?.name || '';
+  }
+
+  getSubIssueName(issueId: number, subId: number): string {
+    const issue = this.issues.find((i) => i.id === issueId);
+    return issue?.subIssues.find((s) => s.id === subId)?.name || '';
+  }
 
   clearSingleSub(issueId: number, subId: number) {
     const selected = this.selectedMap.get(issueId) || [];
-
     const updated = selected.filter((id) => id !== subId);
 
     if (updated.length === 0) {
@@ -107,57 +156,33 @@ export class FocusAreasComponent {
     }
   }
 
-  hasAnySelected(issue: Issue): boolean {
-    return (this.selectedMap.get(issue.id)?.length || 0) > 0;
-  }
-
-  saveSelectedIssues() {
-    const result = this.issues
-      .map((issue) => {
-        const selectedSubIds = this.selectedMap.get(issue.id) || [];
-
-        if (selectedSubIds.length === 0) return null;
-
-        return {
-          issueId: issue.id,
-          issueName: issue.name,
-          subIssues: issue.subIssues.filter((sub) => selectedSubIds.includes(sub.id)),
-        };
-      })
-      .filter(Boolean);
-
-    console.log('Selected Issues:', result);
-
-    this.activeIssue = null;
-  }
-
-  get selectedEntries() {
-    return Array.from(this.selectedMap.entries());
-  }
-
-  getIssueName(issueId: number): string {
-    return this.issues.find((issue) => issue.id === issueId)?.name || '';
-  }
-
-  getSubIssueName(issueId: number, subId: number): string {
-    const issue = this.issues.find((i) => i.id === issueId);
-
-    return issue?.subIssues.find((s) => s.id === subId)?.name || '';
-  }
-
   removeWholeIssue(issueId: number) {
     this.selectedMap.delete(issueId);
   }
 
   clearAll() {
     this.selectedMap.clear();
-
     this.activeIssue = null;
   }
 
+  // ========================
+  // NAVIGATION
+  // ========================
+
+  goToGeoLocation() {
+    this.router.navigate(['/geo-location']);
+  }
+
+  goToFocusGroup() {
+    this.router.navigate(['/focus-group']);
+  }
+
+  // ========================
+  // PASTE MODAL
+  // ========================
+
   openPasteModal() {
     this.pasteText = '';
-
     this.showPasteModal = true;
   }
 
@@ -168,28 +193,30 @@ export class FocusAreasComponent {
   generateFromText() {
     if (!this.pasteText.trim()) {
       alert('Please paste some text');
-
       return;
     }
 
     const text = this.pasteText.toLowerCase();
-
     this.selectedMap.clear();
 
     this.issues.forEach((issue) => {
-      const matchedSubIds: number[] = [];
+      const matched: number[] = [];
 
       issue.subIssues.forEach((sub) => {
         if (text.includes(sub.name.toLowerCase())) {
-          matchedSubIds.push(sub.id);
+          matched.push(sub.id);
         }
       });
 
-      if (matchedSubIds.length > 0) {
-        this.selectedMap.set(issue.id, matchedSubIds);
+      if (matched.length > 0) {
+        this.selectedMap.set(issue.id, matched);
       }
     });
 
+    console.log('AUTO DATA:', this.selectedMap);
     this.showPasteModal = false;
   }
+
+
+  
 }
