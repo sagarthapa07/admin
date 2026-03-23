@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule, FormBuilder, FormGroup } from '@angular/forms';
+import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-seo-social',
@@ -10,27 +11,34 @@ import { ReactiveFormsModule, FormBuilder, FormGroup } from '@angular/forms';
   styleUrl: './seo-social.scss',
 })
 export class SeoSocialComponent {
-  seoForm: FormGroup;
+  opportunityForm: FormGroup;
 
-  constructor(private fb: FormBuilder) {
-    this.seoForm = this.fb.group({
-      friendlyUrl: [''],
-      metaTitle: [''],
-      metaAuthor: [''],
-      metaKeywords: [''],
-      metaDescription: [''],
-      facebookHandler: [''],
-      twitterHandler: [''],
-      googleHandler: [''],
-      instagramHandler: [''],
+  constructor(
+    private fb: FormBuilder,
+    private router: Router,
+  ) {
+    this.opportunityForm = this.fb.group({
+      linkUrl: [''],
+      'M-title': [''],
+      'M-author': [''],
+      'M-keywords': [''],
+      shortInfo: [''],
+      'F-Handler': [''],
+      'T-Handler:': [''],
+      'G-Handler': [''],
+      'I-Handler': [''],
     });
   }
 
-  createByAI() {
-    console.log('Generate SEO using AI');
+  onSave() {
+    console.log('SEO DATA:', this.opportunityForm.value);
   }
 
-  saveSEO() {
-    console.log('SEO Data', this.seoForm.value);
+  goToCounties() {
+    this.router.navigate(['/counties']);
+  }
+
+  goToCalenderArea() {
+    this.router.navigate(['/calendar-details']);
   }
 }

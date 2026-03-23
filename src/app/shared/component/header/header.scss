@@ -248,7 +248,7 @@
 
 .content {
   margin-left: 70px;
-  height: 40px;
+  height: 20px;
   width: calc(100% - 70px);
   transition: all 0.3s ease;
   background: #679bb6;
@@ -261,13 +261,12 @@
 }
 
 .content .home .text {
-  display: flex;
-  align-items: center;
-  padding: 5px 10px;
-  font-weight: 700;
+  font-size: 13px;
+  color: var(--primary-color-light);
+  padding-left:10px ;
 }
 
 .content .home .text span:hover {
-  color: var(--primary-color-light);
   cursor: pointer;
 }
+  

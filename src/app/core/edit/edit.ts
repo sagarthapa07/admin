@@ -80,6 +80,13 @@ import {
 } from 'ckeditor5';
 
 import 'ckeditor5/ckeditor5.css';
+import { SeoSocialComponent } from "../seo-social/seo-social";
+import { CountiesComponent } from "../counties/counties";
+import { FocusGroupsComponent } from "../focus-groups/focus-groups";
+import { FocusAreaComponent } from "../focus-areas/focus-areas";
+import { GeoLocationComponent } from "../geo-location/geo-location";
+import { CalendarDetails } from "../calendar-details/calendar-details";
+import { Editor } from "../editor/editor";
 
 const LICENSE_KEY =
   'eyJhbGciOiJFUzI1NiJ9.eyJleHAiOjE3NzAzMzU5OTksImp0aSI6IjY4MzYwYjc2LTdhY2ItNGNhYy1iMjBjLWFjOWUyNzFhNWFmOSIsInVzYWdlRW5kcG9pbnQiOiJodHRwczovL3Byb3h5LWV2ZW50LmNrZWRpdG9yLmNvbSIsImRpc3RyaWJ1dGlvbkNoYW5uZWwiOlsiY2xvdWQiLCJkcnVwYWwiLCJzaCJdLCJ3aGl0ZUxhYmVsIjp0cnVlLCJsaWNlbnNlVHlwZSI6InRyaWFsIiwiZmVhdHVyZXMiOlsiKiJdLCJ2YyI6IjRmYmQ2YzRlIn0.fdm8GCfvnbf490WhyKVgSBsXYQGdbCVW1lBLAYT8Xmc39IozMH4OAP7yGzcgTaVORs6peSFXNhVtCJzxJBY_LA';
@@ -103,7 +110,14 @@ const CLOUD_SERVICES_TOKEN_URL =
     FormsModule,
     NgMultiSelectDropDownModule,
     CKEditorModule,
-  ],
+    SeoSocialComponent,
+    CountiesComponent,
+    FocusGroupsComponent,
+    FocusAreaComponent,
+    GeoLocationComponent,
+    CalendarDetails,
+    Editor
+],
   templateUrl: './edit.html',
   styleUrl: './edit.scss',
 })
