@@ -5,15 +5,19 @@ import { CalenderOpportunity } from './core/calender-opportunity/calender-opport
 import { Edit } from './core/edit/edit';
 import { ForgetPass } from './auth/forget-pass/forget-pass';
 import { Preview } from './core/preview/preview';
-import { CalendarDetails } from './core/calendar-details/calendar-details';
-import { GeoLocationComponent } from './core/geo-location/geo-location';
-import { FocusAreaComponent } from './core/focus-areas/focus-areas';
-import { FocusGroupsComponent } from './core/focus-groups/focus-groups';
-import { CountiesComponent } from './core/counties/counties';
-import { SeoSocialComponent } from './core/seo-social/seo-social';
+import { AuthGuard } from './core/guards/auth-guard';
 
 export const routes: Routes = [
-  { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
+  { path: '', redirectTo: 'login', pathMatch: 'full' },
+
+
+{
+  path: 'dashboard',
+  loadComponent: () => import('./core/dashboard/dashboard').then(m => m.Dashboard),
+  canActivate: [AuthGuard]
+},
+
+
   {
     path: 'login',
     component: Login,
@@ -21,45 +25,26 @@ export const routes: Routes = [
   {
     path: 'dashboard',
     component: Dashboard,
+    canActivate: [AuthGuard]
   },
   {
     path: 'calendar-opportunity',
     component: CalenderOpportunity,
+    canActivate: [AuthGuard]
   },
   {
     path: 'edit',
     component: Edit,
+    canActivate: [AuthGuard]
   },
   {
     path: 'forget',
     component: ForgetPass,
+    canActivate: [AuthGuard]
   },
   {
     path: 'preview',
     component: Preview,
-  },
-  {
-    path: 'calendar-details',
-    component: CalendarDetails,
-  },
-  {
-    path: 'geo-location',
-    component: GeoLocationComponent,
-  },
-  {
-    path: 'focus-area',
-    component: FocusAreaComponent,
-  },
-  {
-    path: 'focus-group',
-    component: FocusGroupsComponent,
-  },
-  {
-    path: 'counties',
-    component: CountiesComponent,
-  },
-  {
-    path: 'seo-social',
-    component: SeoSocialComponent,
+    canActivate: [AuthGuard]
   },
 ];

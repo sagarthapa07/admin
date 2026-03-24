@@ -3,7 +3,7 @@ import { Component } from '@angular/core';
 import { NgbInputDatepicker, NgbDateStruct } from '@ng-bootstrap/ng-bootstrap/datepicker';
 import { FormsModule } from '@angular/forms';
 import { Header } from '../../shared/component/header/header';
-import { Editor } from "../editor/editor";
+import { Editor } from "../../shared/component/editor/editor";
 
 
 

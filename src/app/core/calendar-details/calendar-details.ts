@@ -3,7 +3,7 @@ import { Header } from '../../shared/component/header/header';
 import { CommonModule, } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { Editor } from "../editor/editor";
+import { Editor } from "../../shared/component/editor/editor";
 @Component({
   standalone: true,
   selector: 'app-calendar-details',
