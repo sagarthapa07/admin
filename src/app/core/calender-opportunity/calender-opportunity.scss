@@ -1,4 +1,4 @@
-.heading{
+.heading {
   font-size: var(--fs-h3);
   font-weight: var(--fw-700);
   color: var(--text-color);
@@ -8,7 +8,6 @@
   font-weight: 700;
   /* margin-left: 85px; */
 }
-
 
 .header-sec .btn {
   border: 1px solid var(--border-color);
@@ -65,9 +64,7 @@
   pointer-events: none;
 }
 
-
 /* DAte Picker */
-
 
 .header-row {
   display: flex;
@@ -140,7 +137,7 @@
   left: -57% !important;
 }
 
-.calendar-btn {  
+.calendar-btn {
   background: var(--body-color);
   color: var(--text-color-light);
 }
@@ -170,24 +167,20 @@
   color: var(--text-color);
 }
 
-
 .calendar-popup {
   position: absolute;
   top: 110%;
   z-index: 1000;
   background: #fff;
   right: 1px;
-  padding: 12px ;
+  padding: 12px;
   border-radius: 8px;
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
 }
 
-
 .range-input {
   max-width: 320px;
 }
-
-
 
 /*  Table  */
 
@@ -278,58 +271,11 @@
   color: #0d6efd;
 }
 
-/* Hover row */
-.custom-table tbody tr:hover {
-  background: #f9fafb;
+.custom-checkbox input{
+  width: 20px;
+  height: 20px;
 }
 
-/* Custom Checkbox */
-.custom-checkbox {
-  position: relative;
-  display: inline-flex;
-  cursor: pointer;
-  margin-right: -20px;
-}
-
-.custom-checkbox input {
-  position: absolute;
-  opacity: 0;
-}
-
-.checkmark {
-  width: 16px;
-  height: 16px;
-  border: 1.5px solid #d0d5dd;
-  border-radius: 4px;
-  background: #fff;
-  transition: 0.2s;
-}
-
-.custom-checkbox:hover .checkmark {
-  border-color: #0d6efd;
-}
-
-.custom-checkbox input:checked + .checkmark {
-  background: #0d6efd;
-  border-color: #0d6efd;
-}
-
-.checkmark::after {
-  content: '';
-  position: absolute;
-  display: none;
-  left: 5px;
-  top: 2px;
-  width: 4px;
-  height: 8px;
-  border: solid white;
-  border-width: 0 2px 2px 0;
-  transform: rotate(45deg);
-}
-
-.custom-checkbox input:checked + .checkmark::after {
-  display: block;
-}
 
 /* Mobile Responsive */
 @media (max-width: 768px) {
@@ -428,4 +374,14 @@
   .footer-right {
     align-self: flex-end;
   }
+}
+.skeleton-row {
+  height: 20px;
+  background: linear-gradient(90deg, #eee, #ddd, #eee);
+  animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+  0% { background-position: -200px 0; }
+  100% { background-position: 200px 0; }
 }

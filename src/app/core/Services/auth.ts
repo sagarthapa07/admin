@@ -16,16 +16,17 @@ export class Auth {
 
   // cookie check
   isLoggedIn(): boolean {
-    return document.cookie.includes('user_Auth');
+    return document.cookie.includes('user_Login');
   }
 
   // set cookie
   setSession() {
-    document.cookie = 'user_Auth=true; path=/';
+    document.cookie = 'user_Login=true; path=/';
   }
 
   // logout
   logout() {
-    document.cookie = 'user_Auth=; Max-Age=0; path=/';
+    document.cookie = 'user_Login=; Max-Age=0; path=/';
   }
 }
+  

@@ -38,4 +38,9 @@ export class Header {
   closeAllMenus() {
     this.activeCollapse = null;
   }
+
+  logout(){
+    this.route.navigate(['/login'])
+    
+  }
 }

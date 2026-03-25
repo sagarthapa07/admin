@@ -3,13 +3,13 @@ import { Component } from '@angular/core';
 import { NgbInputDatepicker, NgbDateStruct } from '@ng-bootstrap/ng-bootstrap/datepicker';
 import { FormsModule } from '@angular/forms';
 import { Header } from '../../shared/component/header/header';
-import { Editor } from "../../shared/component/editor/editor";
+
 
 
 
 @Component({
   selector: 'app-dashboard',
-  imports: [CommonModule, NgbInputDatepicker, FormsModule, Header, Editor],
+  imports: [CommonModule, NgbInputDatepicker, FormsModule, Header],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.scss',
 })

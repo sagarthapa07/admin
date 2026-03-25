@@ -35,22 +35,22 @@
           </div>
 
           @if (open) {
-          <div class="calendar-popup">
-            <div class="d-flex gap-3">
-              <ngb-datepicker
-                [(ngModel)]="fromDate"
-                (dateSelect)="onFromSelect($event)"
-                [navigation]="'select'"
-              ></ngb-datepicker>
+            <div class="calendar-popup">
+              <div class="d-flex gap-3">
+                <ngb-datepicker
+                  [(ngModel)]="fromDate"
+                  (dateSelect)="onFromSelect($event)"
+                  [navigation]="'select'"
+                ></ngb-datepicker>
 
-              <ngb-datepicker
-                [(ngModel)]="toDate"
-                (dateSelect)="onToSelect($event)"
-                [navigation]="'select'"
-                [minDate]="minToDate!"
-              ></ngb-datepicker>
+                <ngb-datepicker
+                  [(ngModel)]="toDate"
+                  (dateSelect)="onToSelect($event)"
+                  [navigation]="'select'"
+                  [minDate]="minToDate!"
+                ></ngb-datepicker>
+              </div>
             </div>
-          </div>
           }
         </div>
         <div>
@@ -79,8 +79,7 @@
           <tr>
             <th>
               <label class="custom-checkbox">
-                <input type="checkbox" />
-                <span class="checkmark"></span>
+                <input type="checkbox" [(ngModel)]="selectAll" (change)="toggleSelectAll($event)" />
               </label>
             </th>
             <th>Opportunity</th>
@@ -93,53 +92,28 @@
           </tr>
         </thead>
 
-        <tbody>
-          <tr>
+        <tbody >
+          <tr *ngFor="let item of grants">
             <td>
               <label class="custom-checkbox">
-                <input type="checkbox" />
-                <span class="checkmark"></span>
+                <input type="checkbox" [(ngModel)]="item.selected" (change)="onItemChange()" />
               </label>
             </td>
-            <td class="id-text">Healthcare Foundation Community Grants (Florida)</td>
-            <td>12 Oct 2024</td>
-            <td>18 Jan 2025</td>
-            <td>0</td>
-            <td><span class="status paid">Published</span></td>
-            <td class="icon-cell" routerLink="/edit"><i class="bi bi-pencil-square"></i></td>
-            <td class="icon-cell"><i class="bi bi-copy"></i></td>
-          </tr>
-
-          <tr>
+            <td class="id-text">{{ item.grantTitle }}</td>
+            <td>{{ item.postDate | date: 'dd MMM yyyy' }}</td>
+            <td>{{ item.deadLineDate | date: 'dd MMM yyyy' }}</td>
+            <td>{{ item.viewCount }}</td>
             <td>
-              <label class="custom-checkbox">
-                <input type="checkbox" />
-                <span class="checkmark"></span>
-              </label>
+              <span class="status" [ngClass]="item.status === 'Published' ? 'paid' : 'pending'">
+                {{ item.status }}
+              </span>
             </td>
-            <td class="id-text">Essex County Community Response Fund 2026 (Massachusetts)</td>
-            <td>30 Nov 2024</td>
-            <td>25 Jan 2026</td>
-            <td>1</td>
-            <td><span class="status pending">Draft</span></td>
-            <td class="icon-cell" routerLink="/edit"><i class="bi bi-pencil-square"></i></td>
-            <td class="icon-cell"><i class="bi bi-copy"></i></td>
-          </tr>
-
-          <tr>
-            <td>
-              <label class="custom-checkbox">
-                <input type="checkbox" />
-                <span class="checkmark"></span>
-              </label>
+            <td class="icon-cell" routerLink="/edit">
+              <i class="bi bi-pencil-square"></i>
             </td>
-            <td class="id-text">County Arts Development Grant Program 2026 (Maryland)</td>
-            <td>15 Nov 2024</td>
-            <td>12 Feb 2025</td>
-            <td>8</td>
-            <td><span class="status pending">Draft</span></td>
-            <td class="icon-cell" routerLink="/edit"><i class="bi bi-pencil-square"></i></td>
-            <td class="icon-cell"><i class="bi bi-copy"></i></td>
+            <td class="icon-cell">
+              <i class="bi bi-copy"></i>
+            </td>
           </tr>
         </tbody>
       </table>
@@ -147,24 +121,60 @@
   </div>
 
   <div class="footer-section">
+    <!-- LEFT -->
     <div class="footer-left">
-      <span>Row Per Page</span>
+      <span>Total records : {{ totalCount }}</span>
 
-      <select class="page-select">
-        <option>10</option>
-        <option>20</option>
-        <option>50</option>
+      <span class="mx-2">Rows per page:</span>
+
+      <select class="page-select" [(ngModel)]="pageSize" (change)="changePage(1)">
+        <option [value]="10">10</option>
+        <option [value]="25">25</option>
+        <option [value]="50">50</option>
       </select>
-
-      <span>Entries</span>
     </div>
 
     <!-- RIGHT -->
     <div class="footer-right">
-      <button class="page-btn disabled">‹</button>
-      <button class="page-btn active">1</button>
-      <button class="page-btn">2</button>
-      <button class="page-btn">›</button>
+      <!-- FIRST -->
+      <button class="page-btn" (click)="changePage(1)">««</button>
+
+      <!-- PREV -->
+      <button class="page-btn" (click)="changePage(pageIndex - 1)">Prev</button>
+
+      <!-- FIRST PAGE -->
+      <button class="page-btn" [class.active]="pageIndex === 1" (click)="changePage(1)">1</button>
+
+      <!-- DOTS -->
+      <span *ngIf="pageIndex > 4">...</span>
+
+      <!-- MIDDLE PAGES -->
+      <button
+        *ngFor="let p of visiblePages"
+        class="page-btn"
+        [class.active]="pageIndex === p"
+        (click)="changePage(p)"
+      >
+        {{ p }}
+      </button>
+
+      <!-- DOTS -->
+      <span *ngIf="pageIndex < totalPages - 3">...</span>
+
+      <!-- LAST PAGE -->
+      <button
+        class="page-btn"
+        [class.active]="pageIndex === totalPages"
+        (click)="changePage(totalPages)"
+      >
+        {{ totalPages }}
+      </button>
+
+      <!-- NEXT -->
+      <button class="page-btn" (click)="changePage(pageIndex + 1)">Next</button>
+
+      <!-- LAST -->
+      <button class="page-btn" (click)="changePage(totalPages)">»»</button>
     </div>
   </div>
 </section>

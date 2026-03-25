@@ -14,7 +14,7 @@ export const routes: Routes = [
 {
   path: 'dashboard',
   loadComponent: () => import('./core/dashboard/dashboard').then(m => m.Dashboard),
-  canActivate: [AuthGuard]
+  // canActivate: [AuthGuard]
 },
 
 
@@ -23,28 +23,23 @@ export const routes: Routes = [
     component: Login,
   },
   {
-    path: 'dashboard',
-    component: Dashboard,
-    canActivate: [AuthGuard]
-  },
-  {
     path: 'calendar-opportunity',
     component: CalenderOpportunity,
-    canActivate: [AuthGuard]
+    // canActivate: [AuthGuard]
   },
   {
     path: 'edit',
     component: Edit,
-    canActivate: [AuthGuard]
+    // canActivate: [AuthGuard]
   },
   {
     path: 'forget',
     component: ForgetPass,
-    canActivate: [AuthGuard]
+    // canActivate: [AuthGuard]
   },
   {
     path: 'preview',
     component: Preview,
-    canActivate: [AuthGuard]
+    // canActivate: [AuthGuard]  
   },
 ];

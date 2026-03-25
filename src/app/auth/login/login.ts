@@ -12,29 +12,24 @@ import { Auth } from '../../core/Services/auth';
   styleUrls: ['./login.scss'],
 })
 export class Login {
-
   loginForm = new FormGroup({
     name: new FormControl('', [Validators.required]),
-    password: new FormControl('', [Validators.required])
+    password: new FormControl('', [Validators.required]),
   });
 
   constructor(
     private auth: Auth,
-    private router: Router
+    private router: Router,
   ) {}
 
-  // 🔐 encryption (IMPORTANT)
+  // encryption (IMPORTANT)
   encryptPassword(password: string): string {
     const key = CryptoJS.enc.Utf8.parse('mySecretKey123');
 
-    const encrypted = CryptoJS.AES.encrypt(
-      CryptoJS.enc.Utf8.parse(password),
-      key,
-      {
-        mode: CryptoJS.mode.ECB,
-        padding: CryptoJS.pad.Pkcs7
-      }
-    );
+    const encrypted = CryptoJS.AES.encrypt(CryptoJS.enc.Utf8.parse(password), key, {
+      mode: CryptoJS.mode.ECB,
+      padding: CryptoJS.pad.Pkcs7,
+    });
 
     return encrypted.ciphertext.toString(CryptoJS.enc.Base64);
   }
@@ -44,25 +39,21 @@ export class Login {
 
     const payload = {
       userName: this.loginForm.value.name,
-      userPassword: this.encryptPassword(this.loginForm.value.password!)
+      userPassword: this.encryptPassword(this.loginForm.value.password!),
     };
 
     this.auth.login(payload).subscribe({
       next: (res) => {
-
-        // ✅ SUCCESS CHECK
         if (res.successCode === 1) {
-
-          this.auth.setSession(); // 🔥 cookie set
-
+          this.auth.setSession();
           this.router.navigate(['/dashboard']);
         } else {
-          alert('❌ Username or Password wrong hai');
+          alert('Username or Password wrong');
         }
       },
       error: () => {
-        alert('❌ Server error');
-      }
+        alert('Server error');
+      },
     });
   }
 }
