@@ -3,14 +3,15 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { NgbDate, NgbDateParserFormatter, NgbDateStruct } from '@ng-bootstrap/ng-bootstrap';
 import { NgbDatepickerModule } from '@ng-bootstrap/ng-bootstrap';
-
 import { RouterLink } from '@angular/router';
 import { Header } from '../../shared/component/header/header';
 import { Api } from '../Services/api';
+import { HostListener } from '@angular/core';
+import { DateRangePicker } from '../../shared/component/date-range-picker/date-range-picker';
 
 @Component({
   selector: 'app-calender-opportunity',
-  imports: [FormsModule, NgbDatepickerModule, CommonModule, Header, RouterLink],
+  imports: [FormsModule, NgbDatepickerModule, CommonModule, Header, RouterLink, DateRangePicker],
   templateUrl: './calender-opportunity.html',
   styleUrl: './calender-opportunity.scss',
 })
@@ -24,10 +25,22 @@ export class CalenderOpportunity {
 
   grants: any[] = [];
   pageIndex = 1;
-  pageSize = 10;
+  pageSize = 25;
   totalCount = 0;
+  searchHistory: string[] = [];
+  showSuggestions = false;
 
   selectAll = false;
+  hoveredDate: NgbDate | null = null;
+
+  @HostListener('document:click', ['$event'])
+  onClickOutside(event: any) {
+    const clickedInside = event.target.closest('.search-wrapper');
+
+    if (!clickedInside) {
+      this.showSuggestions = false;
+    }
+  }
 
   constructor(
     public formatter: NgbDateParserFormatter,
@@ -37,6 +50,9 @@ export class CalenderOpportunity {
 
   ngOnInit() {
     this.getData();
+
+    const data = localStorage.getItem('searchHistory');
+    this.searchHistory = data ? JSON.parse(data) : [];
   }
   getData() {
     const payload = {
@@ -46,11 +62,12 @@ export class CalenderOpportunity {
       platform: '',
       searchText: this.searchText,
       searchType: '',
-      fromDate: this.fromDate ? this.formatter.format(this.fromDate) : null,
-      toDate: this.toDate ? this.formatter.format(this.toDate) : null,
+      fromDate: this.formatDate(this.fromDate),
+      toDate: this.formatDate(this.toDate),
       userIP: '',
       viewType: '',
     };
+
     this.api.getGrants(payload).subscribe({
       next: (res) => {
         console.log('API RESPONSE', res);
@@ -70,8 +87,48 @@ export class CalenderOpportunity {
     });
   }
 
+  clearDateFilter() {
+    this.fromDate = null;
+    this.toDate = null;
+    this.minToDate = null;
+
+    this.pageIndex = 1;
+    this.getData();
+  }
+
+  onDateChange(event: any) {
+    this.fromDate = event.from;
+    this.toDate = event.to;
+    this.open = false;
+    this.pageIndex = 1;
+    this.getData();
+  }
+
+  isHovered(date: NgbDate) {
+    return (
+      this.fromDate &&
+      !this.toDate &&
+      this.hoveredDate &&
+      date.after(this.fromDate) &&
+      date.before(this.hoveredDate)
+    );
+  }
+
+  isInside(date: NgbDate) {
+    return this.toDate && date.after(this.fromDate!) && date.before(this.toDate);
+  }
+
+  isRange(date: NgbDate) {
+    return (
+      date.equals(this.fromDate!) ||
+      date.equals(this.toDate!) ||
+      this.isInside(date) ||
+      this.isHovered(date)
+    );
+  }
+
   toggle() {
-    this.open = !this.open;
+    this.open = true;
   }
 
   get totalPages(): number {
@@ -119,12 +176,22 @@ export class CalenderOpportunity {
   onToSelect(date: NgbDate) {
     this.toDate = date;
     this.open = false;
+    this.pageIndex = 1;
+    this.getData();
   }
-
   get displayValue(): string {
     return this.fromDate && this.toDate
       ? `${this.formatter.format(this.fromDate)} to ${this.formatter.format(this.toDate)}`
       : '';
+  }
+
+  formatDate(date: NgbDate | null): string | null {
+    if (!date) return null;
+
+    const mm = String(date.month).padStart(2, '0');
+    const dd = String(date.day).padStart(2, '0');
+
+    return `${date.year}-${mm}-${dd}`;
   }
 
   menuItems = [
@@ -143,15 +210,45 @@ export class CalenderOpportunity {
   }
 
   toggleSelectAll(event: any) {
-    console.log('CLICK HUA ✅', event.target.checked);
-
+    console.log('CLICK HUA', event.target.checked);
     this.selectAll = event.target.checked;
-
     this.grants.forEach((item) => {
       item.selected = this.selectAll;
     });
   }
   onItemChange() {
     this.selectAll = this.grants.every((item) => item.selected);
+  }
+  onSearch() {
+    const value = this.searchText.trim();
+    if (!value) {
+      this.searchText = '';
+    }
+    // duplicate avoid
+    this.searchHistory = this.searchHistory.filter((item) => item !== value);
+
+    // top pe add karo
+    this.searchHistory.unshift(value);
+
+    // max 5 ya 10 rakhna
+    this.searchHistory = this.searchHistory.slice(0, 5);
+
+    localStorage.setItem('searchHistory', JSON.stringify(this.searchHistory));
+
+    this.pageIndex = 1;
+
+    this.getData();
+    this.showSuggestions = false;
+  }
+
+  selectSuggestion(value: string) {
+    this.searchText = value;
+    this.onSearch();
+  }
+  onInputChange() {
+    if (!this.searchText || !this.searchText.trim()) {
+      this.pageIndex = 1;
+      this.getData();
+    }
   }
 }

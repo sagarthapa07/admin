@@ -1,34 +1,62 @@
-<Section >
+<Section>
   <form [formGroup]="opportunityForm" (ngSubmit)="onSave()">
     <div class="row mt-5">
       <!-- Left Side From Section -->
       <div class="col-md-6">
         <h5 class="section-title">Opportunity Detail</h5>
         <hr />
+
         <div class="form-group">
           <label>Title:</label>
-          <input type="text" class="form-control" formControlName="title" placeholder="Title" />
+          <div class="input-wrapper">
+            <input type="text" class="form-control" formControlName="title" placeholder="Title" />
+            <div class="error" *ngIf="isFieldInvalid('title')">Please Enter a Title.</div>
+          </div>
         </div>
 
         <div class="form-group">
+          <label>Friendly URL:</label>
+          <div class="input-wrapper">
+            <input
+              type="text"
+              class="form-control"
+              formControlName="friendlyURL"
+              placeholder="Friendly URL"
+            />
+            <div class="error" *ngIf="isFieldInvalid('friendlyURL')">
+              Please Enter a Friendly URL.
+            </div>
+          </div>
+        </div>
+        <div class="form-group">
           <label>Link URL:</label>
-          <input
-            type="text"
-            class="form-control"
-            formControlName="linkUrl"
-            placeholder="Friendly URL"
-          />
+          <div class="input-wrapper">
+            <input
+              type="text"
+              class="form-control"
+              formControlName="linkUrl"
+              placeholder="Link URL"
+            />
+            <div class="error" *ngIf="isFieldInvalid('linkUrl')">Please Enter a Link URL.</div>
+          </div>
         </div>
 
         <div class="form-group">
           <label>Post Date:</label>
-
-          <input type="date" class="form-control date-input" formControlName="postDate" />
+          <div class="input-wrapper">
+            <input type="date" class="form-control date-input" formControlName="postDate" />
+            <div class="error" *ngIf="isFieldInvalid('postDate')">Please Enter a Post Date.</div>
+          </div>
         </div>
 
-        <div class="form-group deadline-group">
+        <div class="form-group">
           <label>Deadline Date:</label>
-          <input type="date" class="form-control date-input" formControlName="deadlineDate" />
+          <div class="deadline-input-wrapper">
+            <input type="date" class="form-control date-input" formControlName="deadlineDate" />
+            <div class="error" *ngIf="isFieldInvalid('deadlineDate')">
+              Please Enter a Deadline Date.
+            </div>
+          </div>
 
           <div class="form-check ongoing-box">
             <input
@@ -37,6 +65,7 @@
               formControlName="isOngoing"
               id="ongoing"
             />
+            <div class="error" *ngIf="isFieldInvalid('isOngoing')">Please fill link url</div>
 
             <label class="form-check-label" for="ongoing"> OnGoing Opportunity </label>
           </div>
@@ -44,12 +73,16 @@
 
         <div class="form-group">
           <label>Short Info:</label>
-          <textarea
-            rows="3"
-            class="form-control"
-            formControlName="shortInfo"
-            placeholder="Short Info"
-          ></textarea>
+
+          <div class="input-wrapper">
+            <textarea
+              rows="3"
+              class="form-control"
+              formControlName="shortInfo"
+              placeholder="Short Info"
+            ></textarea>
+            <div class="error" *ngIf="isFieldInvalid('shortInfo')">Please fill Short Info</div>
+          </div>
         </div>
 
         <div class="form-group">
@@ -62,22 +95,34 @@
 
         <div class="form-group">
           <label>Donor Agency:</label>
-          <input
-            type="text"
-            class="form-control"
-            placeholder="Search Donor Agency"
-            formControlName="donorAgency"
-          />
+
+          <div class="input-wrapper" #dropdownContainer>
+            <input
+              type="text"
+              class="form-control"
+              formControlName="donorAgency"
+              (input)="onSearchDonor($event)"
+            />
+
+            <ul class="dropdown-list" *ngIf="showDropdown && donorList.length">
+              <li *ngFor="let item of donorList" (click)="selectDonor(item)">
+                {{ item.donorName }}
+              </li>
+            </ul>
+          </div>
         </div>
 
         <div class="form-group">
           <label>Donor Agency (if not listed above):</label>
-          <input
-            type="text"
-            class="form-control"
-            formControlName="donorAgencyOther"
-            placeholder="Doner Agency"
-          />
+          <div class="input-wrapper">
+            <input
+              type="text"
+              class="form-control"
+              formControlName="donorAgencyOther"
+              placeholder="Doner Agency"
+            />
+            <div class="error" *ngIf="isFieldInvalid('donorAgencyOther')">Please fill link url</div>
+          </div>
         </div>
 
         <div class="form-group">
@@ -116,15 +161,18 @@
 
         <div class="form-group">
           <label>Image:</label>
-          <input type="file" class="form-control" />
+          <input type="file" class="form-control" formControlName="img" />
         </div>
 
         <div class="form-group">
           <label>Status:</label>
           <select class="form-control" formControlName="status">
+            <option value="" disabled selected hidden>Select Status</option>
             <option>Draft</option>
             <option>Published</option>
+            <option>Expired</option>
           </select>
+          <div class="error" *ngIf="isFieldInvalid('status')">Please select status</div>
         </div>
       </div>
 

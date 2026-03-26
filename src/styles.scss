@@ -8,6 +8,7 @@
   --primary-color-light: #f6f5ff;
   --toggle-color: #dddd;
   --text-color-light: #545454;
+  --text-color-dark: #181818;
   --text-color: #222;
   --shadow-color: #a4bec6;
   --svgIcon-color: #0b6a9a;
@@ -16,14 +17,15 @@
   --nav-color: #1d93be;
   --border-color: #e2e4e6;
   --btn-bg-color: #e9edf0;
-  --box-bg-color:#d6dbe0;
+  --box-bg-color: #d6dbe0;
   --placeholder-color: #6b7280;
   --danger-color: #f15c5c;
+  --hover-color: #cecece;
 
   /* Font Sizes */
   --header-text: 22px;
   --body-text: 16px;
-  --placeholder-text: 12px;
+  --placeholder-text: 14px;
 
   /* Extra Small */
   --fs-10: 10px;
@@ -77,8 +79,10 @@
   margin: 30px 12px 0 80px;
 }
 
-
 .heading {
   font-size: var(--fs-12);
   font-weight: var(--fw-700);
 }
+
+/* Importing Bootstrap SCSS file. */
+@import 'bootstrap/scss/bootstrap';

@@ -9,8 +9,27 @@
       <!-- LEFT COLUMN -->
       <div class="header-left">
         <div class="search-box">
-          <i class="fa-solid fa-magnifying-glass icons"></i>
-          <input type="text" placeholder="Search" [(ngModel)]="searchText" />
+          <i class="fa-solid fa-magnifying-glass icons" (click)="onSearch()"></i>
+          <div class="search-wrapper">
+            <input
+              type="text"
+              placeholder="Search"
+              [(ngModel)]="searchText"
+              (focus)="showSuggestions = true"
+              (keyup.enter)="onSearch()"
+              (input)="onInputChange()"
+            />
+
+            <div class="suggestions" *ngIf="showSuggestions && searchHistory.length">
+              <div
+                class="suggestion-item"
+                *ngFor="let item of searchHistory.slice(0, 2)"
+                (click)="selectSuggestion(item)"
+              >
+                {{ item }}
+              </div>
+            </div>
+          </div>
         </div>
 
         <button class="filter-btn">
@@ -28,6 +47,7 @@
               readonly
               [value]="displayValue"
               placeholder="Select date range"
+              (click)="toggle()"
             />
             <button class="btn calendar-btn" type="button">
               <i class="bi bi-calendar3"></i>
@@ -36,20 +56,7 @@
 
           @if (open) {
             <div class="calendar-popup">
-              <div class="d-flex gap-3">
-                <ngb-datepicker
-                  [(ngModel)]="fromDate"
-                  (dateSelect)="onFromSelect($event)"
-                  [navigation]="'select'"
-                ></ngb-datepicker>
-
-                <ngb-datepicker
-                  [(ngModel)]="toDate"
-                  (dateSelect)="onToSelect($event)"
-                  [navigation]="'select'"
-                  [minDate]="minToDate!"
-                ></ngb-datepicker>
-              </div>
+              <app-date-range-picker (dateSelected)="onDateChange($event)"></app-date-range-picker>
             </div>
           }
         </div>
@@ -92,7 +99,7 @@
           </tr>
         </thead>
 
-        <tbody >
+        <tbody>
           <tr *ngFor="let item of grants">
             <td>
               <label class="custom-checkbox">

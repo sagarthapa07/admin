@@ -1,6 +1,5 @@
 .header-btn {
   gap: 5px;
-
 }
 
 .header-btn .btn {
@@ -39,25 +38,29 @@
 }
 
 .form-group {
-  display:flex;
-  align-items:center;
-  gap:15px;
-  margin-bottom:12px;
+  display: flex;
+  align-items: flex-start; // 🔥 important (center hatao)
+  gap: 15px;
+  margin-bottom: 12px;
 }
 
 .form-group label {
-  width:180px;
-  font-weight:500;
+  width: 180px;
+  font-weight: 500;
+  margin-top: 6px;
+}
+.form-group .input-wrapper {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
 }
 
-.date-input{
-  width:350px;
-  margin-left:-33px;
+.date-input {
+  width: 350px;
 }
 
-
-.deadline-group{
-  flex-wrap:wrap;
+.deadline-group {
+  flex-wrap: wrap;
 }
 
 .form-group input {
@@ -82,12 +85,11 @@ select.form-control {
   color: var(--text-color);
 }
 
-
 .ongoing-box {
-  display:flex;
-  align-items:center;
-  gap:8px;
-  margin-left:10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: 10px;
 }
 
 .ongoing-box .form-check-label {
@@ -97,9 +99,8 @@ select.form-control {
   // width:auto;
 }
 
-
 .form-check-input:checked {
-    background-color: var(--nav-color);
+  background-color: var(--nav-color);
 }
 
 .ongoing-box input {
@@ -206,11 +207,9 @@ select.form-control {
   width: 100% !important;
 }
 
-
 ::ng-deep .ck-toolbar {
   border-radius: 6px 6px 0 0 !important;
 }
-
 
 ::ng-deep .ck-editor__editable_inline {
   min-height: 578px;
@@ -231,4 +230,57 @@ select.form-control {
 
 ::ng-deep .ck.ck-toolbar__items > * {
   margin-bottom: 5px;
+}
+
+.error {
+  color: red;
+  width: 250px;
+  font-size: var(--placeholder-text);
+}
+.form-group .deadline-input-wrapper {
+  display: flex;
+  flex-direction: column;
+  margin-left: -32px;
+}
+
+.input-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.dropdown-list {
+  position: absolute;
+  top: 40px;
+  left: 0;
+  width: 100%;
+  background: var(--bs-body-bg);
+  border-radius: 4px;
+  height: 500px;
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 99999;
+  color: var(--text-color);
+  display: block;
+  list-style: none; 
+  padding: 0;
+  margin: 0;
+
+}
+
+/* item */
+.dropdown-list li {
+  padding: 8px 12px;
+  cursor: pointer;
+}
+
+.dropdown-list li:hover {
+  background-color: var(--hover-color);
+  color: var(--text-color-dark);
+}
+
+.opportunity-section,
+.row,
+.col-md-6,
+.form-group {
+  overflow: visible !important;
 }
