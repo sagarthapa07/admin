@@ -1,5 +1,4 @@
 import { Component, ElementRef, ViewChild, HostListener } from '@angular/core';
-import { Header } from '../../shared/component/header/header';
 import { CommonModule } from '@angular/common';
 import {
   FormBuilder,
@@ -14,7 +13,7 @@ import { Api } from '../Services/api';
 @Component({
   standalone: true,
   selector: 'app-calendar-details',
-  imports: [CommonModule, ReactiveFormsModule, FormsModule, Header, Editor],
+  imports: [CommonModule, ReactiveFormsModule, FormsModule, Editor],
   templateUrl: './calendar-details.html',
   styleUrls: ['./calendar-details.scss'],
 })
