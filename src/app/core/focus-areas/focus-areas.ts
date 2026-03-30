@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ISSUES, Issue, SubIssue } from '../edit/issues.data';
+import { Api } from '../Services/api';
+import { lastValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-focus-area',
@@ -14,7 +16,7 @@ import { ISSUES, Issue, SubIssue } from '../edit/issues.data';
 export class FocusAreaComponent implements OnInit {
   @ViewChild('issueContainer') issueContainer!: ElementRef;
 
-  issues: Issue[] = ISSUES;
+  issues: any = ISSUES;
 
   activeIssue: Issue | null = null;
   hoverTimer: any = null;
@@ -24,11 +26,15 @@ export class FocusAreaComponent implements OnInit {
   showPasteModal = false;
   pasteText = '';
 
-  constructor(private router: Router) {}
+  constructor(
+    private router: Router,
+    private api: Api,
+  ) {}
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    this.loadFocusAreas();
+  }
 
-  // 👇 outside click close popup
   @HostListener('document:click', ['$event'])
   handleOutsideClick(event: MouseEvent) {
     if (!this.issueContainer) return;
@@ -40,28 +46,50 @@ export class FocusAreaComponent implements OnInit {
     }
   }
 
-  // ========================
-  // HOVER + CLICK
-  // ========================
-
   onHoverIssue(issue: Issue) {
     this.hoverTimer = setTimeout(() => {
       this.activeIssue = issue;
     }, 500);
   }
 
+  loadFocusAreas() {
+    this.api.getFocusAreas().subscribe({
+      next: async (res) => {
+        if (res.successCode === 1) {
+          this.issues = res.usFocusAreas.map((item: any) => ({
+            id: item.issueIndex,
+            name: item.issueName,
+            subIssues: [],
+          }));
+
+          // 🔥 preload all subIssues
+          for (const issue of this.issues) {
+            try {
+              const subRes: any = await lastValueFrom(this.api.getFocusSubAreas(issue.id));
+
+              if (subRes.successCode === 1) {
+                issue.subIssues = subRes.myList.map((sub: any) => ({
+                  id: sub.subIssueIndex,
+                  name: sub.subIssueName,
+                }));
+              }
+            } catch (err) {
+              console.error('SubIssue load error:', err);
+            }
+          }
+
+          console.log('ALL DATA LOADED:', this.issues);
+        }
+      },
+    });
+  }
   onLeaveIssue() {
     clearTimeout(this.hoverTimer);
   }
-
-  onClickIssue(issue: Issue) {
+  onClickIssue(issue: any) {
     clearTimeout(this.hoverTimer);
     this.activeIssue = issue;
   }
-
-  // ========================
-  // SUB ISSUE LOGIC
-  // ========================
 
   toggleSub(issue: Issue, sub: SubIssue) {
     const selected = this.selectedMap.get(issue.id) || [];
@@ -83,7 +111,6 @@ export class FocusAreaComponent implements OnInit {
   toggleSelectAll(issue: Issue) {
     const allIds = issue.subIssues.map((s) => s.id);
     const selected = this.selectedMap.get(issue.id) || [];
-
     if (selected.length === allIds.length) {
       this.selectedMap.set(issue.id, []);
     } else {
@@ -101,48 +128,27 @@ export class FocusAreaComponent implements OnInit {
     if (this.activeIssue?.id === issueId) {
       this.activeIssue = null;
     }
-  }
+  } 
   hasAnySelected(issue: Issue): boolean {
     return (this.selectedMap.get(issue.id)?.length || 0) > 0;
   }
 
-  // ========================
-  // SAVE (GLOBAL)
-  // ========================
-
   saveSelectedIssues() {
-    const result: any = {};
+    const payload: any[] = [];
 
-    this.issues.forEach((issue) => {
-      const selectedSubIds = this.selectedMap.get(issue.id) || [];
-
-      if (selectedSubIds.length > 0) {
-        result[issue.name] = issue.subIssues
-          .filter((sub) => selectedSubIds.includes(sub.id))
-          .map((sub) => sub.name);
-      }
+    this.selectedMap.forEach((subIds, issueId) => {
+      payload.push({
+        issueIndex: issueId,
+        subIssueIndexes: subIds,
+      });
     });
 
-    console.log('FOCUS AREA DATA:', result);
-
+    console.log('FINAL PAYLOAD:', payload);
     this.activeIssue = null;
   }
 
-  // ========================
-  // SUMMARY
-  // ========================
-
   get selectedEntries() {
     return Array.from(this.selectedMap.entries());
-  }
-
-  getIssueName(issueId: number): string {
-    return this.issues.find((i) => i.id === issueId)?.name || '';
-  }
-
-  getSubIssueName(issueId: number, subId: number): string {
-    const issue = this.issues.find((i) => i.id === issueId);
-    return issue?.subIssues.find((s) => s.id === subId)?.name || '';
   }
 
   clearSingleSub(issueId: number, subId: number) {
@@ -165,10 +171,6 @@ export class FocusAreaComponent implements OnInit {
     this.activeIssue = null;
   }
 
-  // ========================
-  // NAVIGATION
-  // ========================
-
   goToGeoLocation() {
     this.router.navigate(['/geo-location']);
   }
@@ -176,10 +178,6 @@ export class FocusAreaComponent implements OnInit {
   goToFocusGroup() {
     this.router.navigate(['/focus-group']);
   }
-
-  // ========================
-  // PASTE MODAL
-  // ========================
 
   openPasteModal() {
     this.pasteText = '';
@@ -190,33 +188,65 @@ export class FocusAreaComponent implements OnInit {
     this.showPasteModal = false;
   }
 
-  generateFromText() {
+  getIssueName(issueId: number): string {
+    return this.issues.find((issue: any) => issue.id === issueId)?.name || '';
+  }
+
+  getSubIssueName(issueId: number, subId: number): string {
+    const issue = this.issues.find((i: any) => i.id === issueId);
+    return issue?.subIssues.find((s: any) => s.id === subId)?.name || '';
+  }
+
+  private isTextMatching(text: string, subName: string): boolean {
+    const normalizedSubName: string = subName.toLowerCase();
+
+    // Full match
+    if (text.includes(normalizedSubName)) {
+      return true;
+    }
+
+    // Partial word match
+    const words: string[] = normalizedSubName.split(' ');
+    return words.some((word: string) => text.includes(word));
+  }
+  async generateFromText(): Promise<void> {
     if (!this.pasteText.trim()) {
       alert('Please paste some text');
       return;
     }
 
-    const text = this.pasteText.toLowerCase();
+    const text: string = this.pasteText.toLowerCase();
     this.selectedMap.clear();
 
-    this.issues.forEach((issue) => {
-      const matched: number[] = [];
+    for (const issue of this.issues) {
+      try {
+        // Load subIssues if not already loaded
+        if (!issue.subIssues || issue.subIssues.length === 0) {
+          const res: any = await lastValueFrom(this.api.getFocusSubAreas(issue.id));
 
-      issue.subIssues.forEach((sub) => {
-        if (text.includes(sub.name.toLowerCase())) {
-          matched.push(sub.id);
+          if (res.successCode === 1) {
+            issue.subIssues = res.myList.map((sub: any) => ({
+              id: sub.subIssueIndex,
+              name: sub.subIssueName,
+            }));
+          }
         }
-      });
 
-      if (matched.length > 0) {
-        this.selectedMap.set(issue.id, matched);
+        // 🔹 Find matching subIssues
+        const matchedSubIds: number[] = issue.subIssues
+          .filter((sub: any) => this.isTextMatching(text, sub.name))
+          .map((sub: any) => sub.id);
+
+        // 🔹 Save matches
+        if (matchedSubIds.length > 0) {
+          this.selectedMap.set(issue.id, matchedSubIds);
+        }
+      } catch (error) {
+        console.error(`Error loading sub areas for issue ${issue.id}`, error);
       }
-    });
+    }
 
     console.log('AUTO DATA:', this.selectedMap);
     this.showPasteModal = false;
   }
-
-
-  
 }

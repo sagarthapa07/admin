@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { IDropdownSettings, NgMultiSelectDropDownModule } from 'ng-multiselect-dropdown';
+import { Api } from '../Services/api';
 
 @Component({
   selector: 'app-geo-location',
@@ -16,7 +17,10 @@ export class GeoLocationComponent implements OnInit {
   showPasteModal = false;
   pasteText = '';
 
-  constructor(private router: Router) {}
+  constructor(
+    private router: Router,
+    private api: Api,
+  ) {}
 
   showGeoModal: boolean = false;
   geoModalType: 'cities' | 'township' | null = null;
@@ -63,63 +67,51 @@ export class GeoLocationComponent implements OnInit {
   geoKeys: string[] = [];
 
   ngOnInit(): void {
-    // Township
-    this.geoDropdowns.township.data = [
-      { item_id: 1, item_text: 'Roxbury' },
-      { item_id: 2, item_text: 'Champion' },
-      { item_id: 3, item_text: 'Stockholm' },
-      { item_id: 4, item_text: 'Baltimore' },
-      { item_id: 5, item_text: 'Acoma' },
-      { item_id: 6, item_text: 'Acton' },
-      { item_id: 7, item_text: 'Acushnet' },
-      { item_id: 8, item_text: 'Addison' },
-      { item_id: 9, item_text: 'Adirondack' },
-      { item_id: 10, item_text: 'Alloway' },
-    ];
+    console.log("aagya hai data ");
+    this.loadGeoData();
+    this.geoKeys = Object.keys(this.geoDropdowns);
+    console.log("jaldi aagya hai ");
+    
+  }
 
-    // Insular Areas
-    this.geoDropdowns.insular.data = [
-      { item_id: 1, item_text: 'American Samoa' },
-      { item_id: 2, item_text: 'Baker Island' },
-      { item_id: 3, item_text: 'Commonwealth of Puerto Rico' },
-      { item_id: 4, item_text: 'Commonwealth of Northern Mariana Islands' },
-      { item_id: 5, item_text: 'Federated States of Micronesia' },
-      { item_id: 6, item_text: 'Guam' },
-      { item_id: 7, item_text: 'Howland Island' },
-      { item_id: 8, item_text: 'Jarvis Island' },
-      { item_id: 9, item_text: 'Johnston Atoll' },
-      { item_id: 10, item_text: 'Kingman Reef' },
-    ];
-
+  loadGeoData() {
     // Cities
-    this.geoDropdowns.cities.data = [
-      { item_id: 1, item_text: 'Antioch' },
-      { item_id: 2, item_text: 'Benicia' },
-      { item_id: 3, item_text: 'Boca Raton' },
-      { item_id: 4, item_text: 'Bridgewater' },
-      { item_id: 5, item_text: 'Cannon Falls' },
-      { item_id: 6, item_text: 'Concord' },
-      { item_id: 7, item_text: 'East St. Louis' },
-      { item_id: 8, item_text: 'Eastham' },
-      { item_id: 9, item_text: 'Fort Wayne' },
-      { item_id: 10, item_text: 'Fortuna' },
-    ];
+    this.api.getCities().subscribe((res: any) => {
+      this.geoDropdowns.cities.data = [
+        ...res.usCities.map((item: any) => ({
+          item_id: item.cityIndex,
+          item_text: item.cityName.trim(),
+        })),
+      ];
+      console.log(res);
+    });
+
+    // Township
+    this.api.getTownShips().subscribe((res: any) => {
+      this.geoDropdowns.township.data = res.usTownships.map((item: any) => ({
+        item_id: item.townshipIndex,
+        item_text: item.townshipName.trim(),
+      }));
+      console.log(res);
+    });
+
+    // Insular
+    this.api.getInsularAreas().subscribe((res: any) => {
+      this.geoDropdowns.insular.data = res.usInsularAreas.map((item: any) => ({
+        item_id: item.areaIndex,
+        item_text: item.areaName.trim(),
+      }));
+      console.log(res);
+    });
 
     // States
-    this.geoDropdowns.states.data = [
-      { item_id: 1, item_text: 'Alaska' },
-      { item_id: 2, item_text: 'Arizona' },
-      { item_id: 3, item_text: 'New Jersey' },
-      { item_id: 4, item_text: 'North Carolina' },
-      { item_id: 5, item_text: 'Ohio' },
-      { item_id: 6, item_text: 'Oregon' },
-      { item_id: 7, item_text: 'Rhode Island' },
-      { item_id: 8, item_text: 'Tennessee' },
-      { item_id: 9, item_text: 'Utah' },
-      { item_id: 10, item_text: 'Virginia' },
-    ];
-
-    this.geoKeys = Object.keys(this.geoDropdowns);
+    this.api.getStates().subscribe((res: any) => {
+      this.geoDropdowns.states.data = res.usStates.map((item: any) => ({
+        item_id: item.stateIndex,
+        item_text: item.stateName.trim(),
+      }));
+      console.log(res);
+    });
   }
 
   goToFocusAreas() {

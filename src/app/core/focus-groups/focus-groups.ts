@@ -6,6 +6,7 @@ import { IDropdownSettings, NgMultiSelectDropDownModule } from 'ng-multiselect-d
 import { ISSUES, Issue } from '../edit/issues.data';
 import { PLATFORM_ID } from '@angular/core';
 import { Preview } from '../Services/preview';
+import { Api } from '../Services/api';
 
 @Component({
   selector: 'app-focus-groups',
@@ -48,12 +49,13 @@ export class FocusGroupsComponent implements OnInit {
   activeEntityForSubGrid: string | null = null;
   showPasteModal = false;
   pasteText = '';
-
+  isLoading = true;
   constructor(
     private fb: FormBuilder,
     private route: ActivatedRoute,
     private router: Router,
     private previewService: Preview,
+    private api: Api,
     @Inject(PLATFORM_ID) private platformId: Object,
   ) {
     this.opportunityForm = this.fb.group({
@@ -146,28 +148,52 @@ export class FocusGroupsComponent implements OnInit {
   };
 
   ngOnInit(): void {
-    this.focusGroupKeyDropdowns.beneficiaries.data = [
-      { item_id: 1, item_text: 'Alaskan Natives' },
-      { item_id: 2, item_text: 'American Indians' },
-      { item_id: 3, item_text: 'Artists' },
-      { item_id: 4, item_text: 'Asian American Or Pacific Islander' },
-      { item_id: 5, item_text: 'Autistic Children' },
-      { item_id: 6, item_text: 'BIPOC' },
-      { item_id: 7, item_text: 'Bisexuals' },
-      { item_id: 8, item_text: 'Blacks' },
-      { item_id: 9, item_text: 'Business' },
-      { item_id: 10, item_text: 'Children' },
-    ];
+    this.loadBeneficiaries();
+    this.loadEntities();
+    this.api.getBeneficiaries().subscribe({
+      next: (res) => {
+        this.isLoading = false;
+      },
+      error: () => {
+        this.isLoading = false;
+      },
+    });
+  }
 
-    this.focusGroupKeyDropdowns.entities.data = [
-      { item_id: 1, item_text: 'Businesses' },
-      { item_id: 2, item_text: 'Centres' },
-      { item_id: 3, item_text: 'Individuals' },
-      { item_id: 4, item_text: 'Organizations' },
-    ];
+  loadBeneficiaries() {
+    this.isLoading = true; // 🔥 start loader
 
-    this.issues.forEach((i) => {
-      this.issueMap.set(i.id, i.name);
+    this.api.getBeneficiaries().subscribe({
+      next: (res) => {
+        this.isLoading = false; // ✅ stop loader
+
+        console.log(res);
+
+        this.focusGroupKeyDropdowns.beneficiaries.data = res.map((item: any) => ({
+          item_id: item.id,
+          item_text: item.name,
+        }));
+      },
+      error: (err) => {
+        this.isLoading = false; // ❌ error me bhi stop
+        console.error(err);
+      },
+    });
+  }
+
+  loadEntities() {
+    this.api.getEntities().subscribe({
+      next: (res: any) => {
+        console.log('Entities API:', res);
+
+        this.focusGroupKeyDropdowns.entities.data = res.map((item: any) => ({
+          item_id: item.id || item.entityId,
+          item_text: item.name || item.entityName,
+        }));
+      },
+      error: (err) => {
+        console.error('Entities API Error:', err);
+      },
     });
   }
 
