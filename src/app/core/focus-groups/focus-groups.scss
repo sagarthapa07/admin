@@ -100,11 +100,10 @@
   align-items: center;
   gap: 8px;
   cursor: pointer;
-  color: #374151;
 }
 
 .sub-checkbox span {
-  font-size: var(--body-text);
+  font-size: var(--sub-checkbox);
   color: var(--text-color);
 }
 
@@ -153,13 +152,13 @@
   padding: 6px 10px;
   border-radius: 6px;
   cursor: pointer;
-  font-size: 14px;
+  font-size: var(--placeholder-text);
 }
 
 .sub-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr); /* 4 columns per row */
-  gap: 10px 20px; /* row gap | column gap */
+  grid-template-columns: repeat(3, 1fr);
+  gap: 5px 10px; 
   margin-top: 10px;
 }
 

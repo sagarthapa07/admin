@@ -52,6 +52,8 @@ export class Api {
     );
   }
 
+  // Focus Group k liyeee APis used
+
   getBeneficiaries(): Observable<any> {
     return this.http.get(
       'https://ang-dnd.fundsforngospremium.com/api/Beneficiaries/GetBeneficiaries',
@@ -61,5 +63,11 @@ export class Api {
   // Entities API
   getEntities(): Observable<any> {
     return this.http.get('https://ang-dnd.fundsforngospremium.com/api/Entities/GetEntities');
+  }
+
+  getSubEntities(entId: number): Observable<any> {
+    return this.http.get(
+      `https://ang-dnd.fundsforngospremium.com/api/SubEntities/GetSubEntitiesForEntity?EntId=${entId}`,
+    );
   }
 }

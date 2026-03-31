@@ -41,6 +41,8 @@ export class FocusGroupsComponent implements OnInit {
     }
   }
 
+  subEntitiesList: any[] = [];
+
   issues: Issue[] = ISSUES;
   activeIssue: Issue | null = null;
   hoverTimer: any = null;
@@ -150,53 +152,31 @@ export class FocusGroupsComponent implements OnInit {
   ngOnInit(): void {
     this.loadBeneficiaries();
     this.loadEntities();
-    this.api.getBeneficiaries().subscribe({
-      next: (res) => {
-        this.isLoading = false;
-      },
-      error: () => {
-        this.isLoading = false;
-      },
-    });
   }
 
   loadBeneficiaries() {
-    this.isLoading = true; // 🔥 start loader
-
     this.api.getBeneficiaries().subscribe({
-      next: (res) => {
-        this.isLoading = false; // ✅ stop loader
-
-        console.log(res);
-
-        this.focusGroupKeyDropdowns.beneficiaries.data = res.map((item: any) => ({
-          item_id: item.id,
-          item_text: item.name,
+      next: (res: any) => {
+        const mapped = res.tempUSBeneficiaries.map((item: any) => ({
+          item_id: item.beneficiaryIndex,
+          item_text: item.beneficiaryName,
         }));
-      },
-      error: (err) => {
-        this.isLoading = false; // ❌ error me bhi stop
-        console.error(err);
+
+        this.focusGroupKeyDropdowns.beneficiaries.data = [...mapped];
       },
     });
   }
-
   loadEntities() {
     this.api.getEntities().subscribe({
       next: (res: any) => {
-        console.log('Entities API:', res);
-
-        this.focusGroupKeyDropdowns.entities.data = res.map((item: any) => ({
-          item_id: item.id || item.entityId,
-          item_text: item.name || item.entityName,
+        const mapped = res.usEntities.map((item: any) => ({
+          item_id: item.entIndex,
+          item_text: item.entName,
         }));
-      },
-      error: (err) => {
-        console.error('Entities API Error:', err);
+        this.focusGroupKeyDropdowns.entities.data = [...mapped];
       },
     });
   }
-
   goToGeoLocation() {
     this.router.navigate(['/geo-location']);
   }
@@ -253,15 +233,32 @@ export class FocusGroupsComponent implements OnInit {
 
     if (!selected || selected.length === 0) {
       this.activeEntityForSubGrid = null;
+      this.subEntitiesList = [];
       return;
     }
 
-    const currentEntity = selected[0].item_text;
+    const currentEntity = selected[0];
 
-    this.activeEntityForSubGrid = currentEntity;
+    const entityName = currentEntity.item_text;
+    const entId = currentEntity.item_id;
 
-    if (!this.selectedSubEntities[currentEntity]) {
-      this.selectedSubEntities[currentEntity] = [];
+    this.activeEntityForSubGrid = entityName;
+
+    // API call for sub-entities
+    this.api.getSubEntities(entId).subscribe({
+      next: (res: any) => {
+        console.log('SubEntities API:', res);
+
+        this.subEntitiesList = res.subEntities || [];
+      },
+      error: (err) => {
+        console.error('SubEntities API Error:', err);
+      },
+    });
+
+    // initialize storage
+    if (!this.selectedSubEntities[entityName]) {
+      this.selectedSubEntities[entityName] = [];
     }
   }
 

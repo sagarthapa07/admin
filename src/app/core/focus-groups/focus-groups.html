@@ -54,18 +54,16 @@
         <div class="row mt-4" *ngIf="activeEntityForSubGrid">
           <div class="col-12">
             <h6>{{ activeEntityForSubGrid }}</h6>
-
             <div class="sub-grid">
-              <label
-                class="sub-checkbox"
-                *ngFor="let sub of entitySubEntityMap[activeEntityForSubGrid]"
-              >
+              <label class="sub-checkbox" *ngFor="let sub of subEntitiesList">
                 <input
                   type="checkbox"
-                  [checked]="selectedSubEntities[activeEntityForSubGrid]?.includes(sub)"
-                  (change)="toggleSubEntity(activeEntityForSubGrid, sub, $event.target.checked)"
+                  [checked]="selectedSubEntities[activeEntityForSubGrid]?.includes(sub.subEntName)"
+                  (change)="
+                    toggleSubEntity(activeEntityForSubGrid, sub.subEntName, $event.target.checked)
+                  "
                 />
-                <span>{{ sub }}</span>
+                <span>{{ sub.subEntName }}</span>
               </label>
             </div>
           </div>
