@@ -70,4 +70,16 @@ export class Api {
       `https://ang-dnd.fundsforngospremium.com/api/SubEntities/GetSubEntitiesForEntity?EntId=${entId}`,
     );
   }
+
+  //   ye hai State k Data ko get krnae k liye jo dropdown mai use hoga 
+  getAllStates(): Observable<any> {
+    return this.http.get('https://ang-dnd.fundsforngospremium.com/api/States/GetAllStates');
+  }
+
+  // ye hai kisi state ki county ko get krne k liye 
+  getCountiesByState(stateId: number): Observable<any> {
+    return this.http.get(
+      `https://ang-dnd.fundsforngospremium.com/api/GEOCounties/GetGEOCountiesForStates?StateID=${stateId}`,
+    );
+  }
 }

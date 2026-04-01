@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { Header } from '../../shared/component/header/header';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, FormsModule } from '@angular/forms';
+import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { IDropdownSettings, NgMultiSelectDropDownModule } from 'ng-multiselect-dropdown';
 import { Api } from '../Services/api';
@@ -9,7 +8,7 @@ import { Api } from '../Services/api';
 @Component({
   selector: 'app-geo-location',
   standalone: true,
-  imports: [CommonModule, FormsModule, NgMultiSelectDropDownModule, Header],
+  imports: [CommonModule, FormsModule, NgMultiSelectDropDownModule],
   templateUrl: './geo-location.html',
   styleUrl: './geo-location.scss',
 })
@@ -67,11 +66,10 @@ export class GeoLocationComponent implements OnInit {
   geoKeys: string[] = [];
 
   ngOnInit(): void {
-    console.log("aagya hai data ");
+    console.log('aagya hai data ');
     this.loadGeoData();
     this.geoKeys = Object.keys(this.geoDropdowns);
-    console.log("jaldi aagya hai ");
-    
+    console.log('jaldi aagya hai ');
   }
 
   loadGeoData() {

@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { IDropdownSettings, NgMultiSelectDropDownModule } from 'ng-multiselect-dropdown';
-import { ISSUES, Issue } from '../edit/issues.data';
 import { PLATFORM_ID } from '@angular/core';
 import { Preview } from '../Services/preview';
 import { Api } from '../Services/api';
@@ -32,19 +31,9 @@ export class FocusGroupsComponent implements OnInit {
     if (!this.issueContainer) return;
 
     const clickedInside = this.issueContainer.nativeElement.contains(event.target);
-
-    // FIX: prevent unnecessary change detection loop
-    if (!clickedInside && this.activeIssue !== null) {
-      setTimeout(() => {
-        this.activeIssue = null;
-      });
-    }
   }
 
   subEntitiesList: any[] = [];
-
-  issues: Issue[] = ISSUES;
-  activeIssue: Issue | null = null;
   hoverTimer: any = null;
   issueMap = new Map<number, string>();
   selectedMap = new Map<number, number[]>();
