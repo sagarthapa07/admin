@@ -64,7 +64,7 @@ export class CountiesComponent implements OnInit {
     allowSearchFilter: true,
   };
 
-  // ✅ STATIC MAP (MAIN LOGIC)
+  //  STATIC MAP (MAIN LOGIC)
   countiySubCountyMap: Record<string, string[]> = {
     California: ['Los Angeles', 'San Diego', 'Orange'],
     Texas: ['Harris', 'Dallas', 'Tarrant'],
@@ -131,7 +131,11 @@ export class CountiesComponent implements OnInit {
   onSingleStateChange() {
     const selected = this.countiesKeyDropDowns.states.selected;
 
-    if (!selected.length) return;
+    if (!selected.length) {
+      this.activeStatesForCounties = null;
+      this.selectedState = [];
+      return;
+    }
 
     const stateObj = selected[0];
     const stateName = stateObj.item_text;
@@ -166,7 +170,11 @@ export class CountiesComponent implements OnInit {
 
   onMultipleStateChange() {
     const selected: any[] = this.multipleStatesDropdown.selected;
-    if (!selected.length) return;
+
+    if (!selected.length) {
+      this.multipleActiveState = null;
+      return;
+    }
 
     const lastSelected = selected[selected.length - 1];
     const stateName = lastSelected.item_text;
@@ -242,7 +250,7 @@ export class CountiesComponent implements OnInit {
   }
 
   // ================= PASTE =================
-  
+
   generateCountiesFromText() {
     const text = this.pasteText.toLowerCase();
     const states = Object.keys(this.countiySubCountyMap);

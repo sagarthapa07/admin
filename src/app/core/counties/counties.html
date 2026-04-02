@@ -103,7 +103,12 @@
         <!-- SUB GRID -->
         <div
           class="row"
-          *ngIf="grantMode === 'single' && activeStatesForCounties && !singleFullStateMode"
+          *ngIf="
+            grantMode === 'single' &&
+            countiesKeyDropDowns.states.selected.length &&
+            activeStatesForCounties &&
+            !singleFullStateMode
+          "
         >
           <div class="col-12">
             <div class="county-grid-container">
