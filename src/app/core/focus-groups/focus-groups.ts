@@ -1,11 +1,19 @@
 import { Component, OnInit, HostListener, ElementRef, ViewChild, Inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, FormsModule } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Router } from '@angular/router';
 import { IDropdownSettings, NgMultiSelectDropDownModule } from 'ng-multiselect-dropdown';
 import { PLATFORM_ID } from '@angular/core';
-import { Preview } from '../Services/preview';
 import { Api } from '../Services/api';
+import {
+  Beneficiary,
+  DropdownItem,
+  Entity,
+  GetBeneficiariesResponse,
+  GetEntitiesResponse,
+  GetSubEntitiesResponse,
+  SubEntity,
+} from '../../datatype';
 
 @Component({
   selector: 'app-focus-groups',
@@ -19,9 +27,7 @@ export class FocusGroupsComponent implements OnInit {
   @ViewChild('editorOutlineElement') private editorOutline!: ElementRef<HTMLDivElement>;
   @ViewChild('editorWordCountElement') private editorWordCount!: ElementRef<HTMLDivElement>;
   @ViewChild('issueContainer') issueContainer!: ElementRef;
-  key: any;
 
-  // public Editor: any;
   public isBrowser = false;
   activeBtn: string = 'calendar';
   opportunityForm: FormGroup;
@@ -29,12 +35,10 @@ export class FocusGroupsComponent implements OnInit {
   @HostListener('document:click', ['$event'])
   handleOutsideClick(event: MouseEvent) {
     if (!this.issueContainer) return;
-
-    const clickedInside = this.issueContainer.nativeElement.contains(event.target);
   }
 
-  subEntitiesList: any[] = [];
-  hoverTimer: any = null;
+  subEntitiesList: SubEntity[] = [];
+  hoverTimer: ReturnType<typeof setTimeout> | null = null;
   issueMap = new Map<number, string>();
   selectedMap = new Map<number, number[]>();
   activeEntityForSubGrid: string | null = null;
@@ -43,9 +47,7 @@ export class FocusGroupsComponent implements OnInit {
   isLoading = true;
   constructor(
     private fb: FormBuilder,
-    private route: ActivatedRoute,
     private router: Router,
-    private previewService: Preview,
     private api: Api,
     @Inject(PLATFORM_ID) private platformId: Object,
   ) {
@@ -125,7 +127,18 @@ export class FocusGroupsComponent implements OnInit {
   savedEntities: string[] = [];
   savedBeneficiaries: string[] = [];
 
-  focusGroupKeyDropdowns: any = {
+  focusGroupKeyDropdowns: {
+    beneficiaries: {
+      label: string;
+      data: DropdownItem[];
+      selected: DropdownItem[];
+    };
+    entities: {
+      label: string;
+      data: DropdownItem[];
+      selected: DropdownItem[];
+    };
+  } = {
     beneficiaries: {
       label: 'Beneficiaries',
       data: [],
@@ -137,7 +150,6 @@ export class FocusGroupsComponent implements OnInit {
       selected: [],
     },
   };
-
   ngOnInit(): void {
     this.loadBeneficiaries();
     this.loadEntities();
@@ -145,8 +157,8 @@ export class FocusGroupsComponent implements OnInit {
 
   loadBeneficiaries() {
     this.api.getBeneficiaries().subscribe({
-      next: (res: any) => {
-        const mapped = res.tempUSBeneficiaries.map((item: any) => ({
+      next: (res: GetBeneficiariesResponse) => {
+        const mapped = res.tempUSBeneficiaries.map((item: Beneficiary) => ({
           item_id: item.beneficiaryIndex,
           item_text: item.beneficiaryName,
         }));
@@ -157,11 +169,12 @@ export class FocusGroupsComponent implements OnInit {
   }
   loadEntities() {
     this.api.getEntities().subscribe({
-      next: (res: any) => {
-        const mapped = res.usEntities.map((item: any) => ({
+      next: (res: GetEntitiesResponse) => {
+        const mapped = res.usEntities.map((item: Entity) => ({
           item_id: item.entIndex,
           item_text: item.entName,
         }));
+
         this.focusGroupKeyDropdowns.entities.data = [...mapped];
       },
     });
@@ -213,7 +226,7 @@ export class FocusGroupsComponent implements OnInit {
     // dropdown se bhi remove
     this.focusGroupKeyDropdowns.beneficiaries.selected =
       this.focusGroupKeyDropdowns.beneficiaries.selected.filter(
-        (item: any) => item.item_text !== name,
+        (item: DropdownItem) => item.item_text !== name,
       );
   }
 
@@ -235,9 +248,7 @@ export class FocusGroupsComponent implements OnInit {
 
     // API call for sub-entities
     this.api.getSubEntities(entId).subscribe({
-      next: (res: any) => {
-        console.log('SubEntities API:', res);
-
+      next: (res: GetSubEntitiesResponse) => {
         this.subEntitiesList = res.subEntities || [];
       },
       error: (err) => {
@@ -275,7 +286,7 @@ export class FocusGroupsComponent implements OnInit {
   }
 
   saveFocusGroup(type: string) {
-    const selected = this.focusGroupKeyDropdowns[type].selected;
+    const selected: DropdownItem[] = this.focusGroupKeyDropdowns.entities.selected;
 
     if (!selected || selected.length === 0) {
       console.log('No selection');
@@ -283,7 +294,7 @@ export class FocusGroupsComponent implements OnInit {
     }
 
     if (type === 'beneficiaries') {
-      this.savedBeneficiaries = selected.map((item: any) => item.item_text);
+      this.savedBeneficiaries = selected.map((item: DropdownItem) => item.item_text);
 
       console.log('Selected Beneficiaries:', this.savedBeneficiaries);
     }
@@ -311,7 +322,7 @@ export class FocusGroupsComponent implements OnInit {
 
   onBeneficiaryChange() {
     const selected = this.focusGroupKeyDropdowns.beneficiaries.selected;
-    this.savedBeneficiaries = selected.map((item: any) => item.item_text);
+    this.savedBeneficiaries = selected.map((item: DropdownItem) => item.item_text);
   }
 
   saveAllFocusGroup() {

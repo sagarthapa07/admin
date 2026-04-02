@@ -4,6 +4,19 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { IDropdownSettings, NgMultiSelectDropDownModule } from 'ng-multiselect-dropdown';
 import { Api } from '../Services/api';
+import {
+  City,
+  DropdownItem,
+  GetCitiesResponse,
+  GetInsularResponse,
+  GetStatesResponse,
+  GetTownshipResponse,
+  InsularArea,
+  Township,
+  State,
+} from '../../datatype';
+
+type GeoKey = 'cities' | 'township' | 'insular' | 'states';
 
 @Component({
   selector: 'app-geo-location',
@@ -23,6 +36,7 @@ export class GeoLocationComponent implements OnInit {
 
   showGeoModal: boolean = false;
   geoModalType: 'cities' | 'township' | null = null;
+
   newGeoName: string = '';
 
   shouldShowAdd(key: string): boolean {
@@ -40,7 +54,28 @@ export class GeoLocationComponent implements OnInit {
     enableCheckAll: false,
   };
 
-  geoDropdowns: any = {
+  geoDropdowns: {
+    township: {
+      label: string;
+      data: DropdownItem[];
+      selected: DropdownItem[];
+    };
+    insular: {
+      label: string;
+      data: DropdownItem[];
+      selected: DropdownItem[];
+    };
+    cities: {
+      label: string;
+      data: DropdownItem[];
+      selected: DropdownItem[];
+    };
+    states: {
+      label: string;
+      data: DropdownItem[];
+      selected: DropdownItem[];
+    };
+  } = {
     township: {
       label: 'Town Ship',
       data: [],
@@ -63,52 +98,46 @@ export class GeoLocationComponent implements OnInit {
     },
   };
 
-  geoKeys: string[] = [];
+  geoKeys: GeoKey[] = [];
 
   ngOnInit(): void {
     console.log('aagya hai data ');
     this.loadGeoData();
-    this.geoKeys = Object.keys(this.geoDropdowns);
+    this.geoKeys = Object.keys(this.geoDropdowns) as GeoKey[];
     console.log('jaldi aagya hai ');
   }
 
   loadGeoData() {
     // Cities
-    this.api.getCities().subscribe((res: any) => {
-      this.geoDropdowns.cities.data = [
-        ...res.usCities.map((item: any) => ({
-          item_id: item.cityIndex,
-          item_text: item.cityName.trim(),
-        })),
-      ];
-      console.log(res);
+    this.api.getCities().subscribe((res: GetCitiesResponse) => {
+      this.geoDropdowns.cities.data = res.usCities.map((item: City) => ({
+        item_id: item.cityIndex,
+        item_text: item.cityName.trim(),
+      }));
     });
 
     // Township
-    this.api.getTownShips().subscribe((res: any) => {
-      this.geoDropdowns.township.data = res.usTownships.map((item: any) => ({
+    this.api.getTownShips().subscribe((res: GetTownshipResponse) => {
+      this.geoDropdowns.township.data = res.usTownships.map((item: Township) => ({
         item_id: item.townshipIndex,
         item_text: item.townshipName.trim(),
       }));
-      console.log(res);
     });
 
     // Insular
-    this.api.getInsularAreas().subscribe((res: any) => {
-      this.geoDropdowns.insular.data = res.usInsularAreas.map((item: any) => ({
+    this.api.getInsularAreas().subscribe((res: GetInsularResponse) => {
+      this.geoDropdowns.insular.data = res.usInsularAreas.map((item: InsularArea) => ({
         item_id: item.areaIndex,
         item_text: item.areaName.trim(),
       }));
-      console.log(res);
     });
 
     // States
-    this.api.getStates().subscribe((res: any) => {
-      this.geoDropdowns.states.data = res.usStates.map((item: any) => ({
+    this.api.getStates().subscribe((res: GetStatesResponse) => {
+      this.geoDropdowns.states.data = res.usStates.map((item: State) => ({
         item_id: item.stateIndex,
         item_text: item.stateName.trim(),
       }));
-      console.log(res);
     });
   }
 
@@ -125,7 +154,7 @@ export class GeoLocationComponent implements OnInit {
     this.geoModalType = null;
     this.newGeoName = '';
   }
-  openGeoModal(type: string) {
+  openGeoModal(type: GeoKey) {
     if (type !== 'cities' && type !== 'township') {
       return;
     }
@@ -141,7 +170,7 @@ export class GeoLocationComponent implements OnInit {
 
     // Duplicate Check (case-insensitive)
     const exists = this.geoDropdowns[this.geoModalType].data.some(
-      (item: any) => item.item_text.toLowerCase() === trimmedName.toLowerCase(),
+      (item: DropdownItem) => item.item_text.toLowerCase() === trimmedName.toLowerCase(),
     );
 
     if (exists) {
@@ -159,19 +188,19 @@ export class GeoLocationComponent implements OnInit {
     console.log(`New ${this.geoModalType} added:`, newItem);
     this.closeGeoModal();
   }
-  saveGeo(type: string) {
+  saveGeo(type: GeoKey) {
     const selectedItems = this.geoDropdowns[type].selected;
     if (!selectedItems || selectedItems.length === 0) {
       console.log(`${this.geoDropdowns[type].label} : No selection`);
       return;
     }
     // sirf names nikaal rahe hain
-    const names = selectedItems.map((item: any) => item.item_text);
+    const names = selectedItems.map((item: DropdownItem) => item.item_text);
     console.log(`${this.geoDropdowns[type].label} : ${names.join(', ')}`);
   }
-  removeGeoItem(type: string, item: any) {
+  removeGeoItem(type: GeoKey, item: DropdownItem) {
     this.geoDropdowns[type].selected = this.geoDropdowns[type].selected.filter(
-      (selectedItem: any) => selectedItem.item_id !== item.item_id,
+      (selectedItem: DropdownItem) => selectedItem.item_id !== item.item_id,
     );
   }
 
@@ -194,19 +223,18 @@ export class GeoLocationComponent implements OnInit {
   }
 
   clearAll() {
-    Object.keys(this.geoDropdowns).forEach((key) => {
+    (Object.keys(this.geoDropdowns) as (keyof typeof this.geoDropdowns)[]).forEach((key) => {
       this.geoDropdowns[key].selected = [];
     });
   }
 
   saveAll() {
-    const result: any = {};
-    Object.keys(this.geoDropdowns).forEach((key) => {
+    const result: Record<string, string[]> = {};
+    (Object.keys(this.geoDropdowns) as GeoKey[]).forEach((key) => {
       const selected = this.geoDropdowns[key].selected;
       if (selected.length > 0) {
-        result[key] = selected.map((item: any) => item.item_text);
+        result[key] = selected.map((item: DropdownItem) => item.item_text);
       }
     });
-    console.log('SAVE DATA:', result);
   }
 }

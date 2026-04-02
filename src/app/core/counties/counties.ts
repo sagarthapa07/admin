@@ -4,6 +4,13 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { IDropdownSettings, NgMultiSelectDropDownModule } from 'ng-multiselect-dropdown';
 import { Api } from '../Services/api';
+import {
+  County,
+  DropdownItem,
+  GetCountiesResponse,
+  GetStatesResponse,
+  State,
+} from '../../datatype';
 
 @Component({
   selector: 'app-counties',
@@ -35,7 +42,13 @@ export class CountiesComponent implements OnInit {
   multipleSelectedCounties: Record<string, string[]> = {};
   multipleActiveState: string | null = null;
 
-  countiesKeyDropDowns: any = {
+  countiesKeyDropDowns: {
+    states: {
+      label: string;
+      data: DropdownItem[];
+      selected: DropdownItem[];
+    };
+  } = {
     states: {
       label: 'Select States',
       data: [],
@@ -43,7 +56,10 @@ export class CountiesComponent implements OnInit {
     },
   };
 
-  multipleStatesDropdown = {
+  multipleStatesDropdown: {
+    data: DropdownItem[];
+    selected: DropdownItem[];
+  } = {
     data: [],
     selected: [],
   };
@@ -72,12 +88,12 @@ export class CountiesComponent implements OnInit {
   };
 
   ngOnInit(): void {
-    this.api.getAllStates().subscribe((res: any) => {
+    this.api.getAllStates().subscribe((res: GetStatesResponse) => {
       console.log('API RESPONSE:', res);
 
       const states = res.states || [];
 
-      this.countiesKeyDropDowns.states.data = states.map((s: any) => ({
+      this.countiesKeyDropDowns.states.data = states.map((s: State) => ({
         item_id: s.stateIndex,
         item_text: s.stateName,
       }));
@@ -137,55 +153,52 @@ export class CountiesComponent implements OnInit {
       return;
     }
 
-    const stateObj = selected[0];
+    const stateObj: DropdownItem = selected[0];
     const stateName = stateObj.item_text;
 
     this.selectedState = [stateName];
     this.activeStatesForCounties = stateName;
 
-    this.api.getCountiesByState(stateObj.item_id).subscribe((res: any) => {
+    this.api.getCountiesByState(stateObj.item_id).subscribe((res: GetCountiesResponse) => {
       console.log('COUNTIES API RESPONSE:', res);
 
       const counties = res.usgeoCounties || [];
 
-      this.countiySubCountyMap[stateName] = counties.map((c: any) => c.countyName);
+      this.countiySubCountyMap[stateName] = counties.map((c: County) => c.countyName);
 
       // refresh selection
       this.selectedSubCounties[stateName] = [];
     });
   }
-
-  onSingleToggleChange(event: any) {
-    this.singleFullStateMode = event.target.checked;
+  onSingleToggleChange(event: Event) {
+    const checked = (event.target as HTMLInputElement).checked;
+    this.singleFullStateMode = checked;
 
     const state = this.activeStatesForCounties;
     if (!state) return;
 
-    this.selectedSubCounties[state] = this.singleFullStateMode
-      ? [...(this.countiySubCountyMap[state] || [])]
-      : [];
+    this.selectedSubCounties[state] = checked ? [...(this.countiySubCountyMap[state] || [])] : [];
   }
-
   // ================= MULTIPLE =================
 
   onMultipleStateChange() {
-    const selected: any[] = this.multipleStatesDropdown.selected;
+    const selected: DropdownItem[] = this.multipleStatesDropdown.selected;
 
     if (!selected.length) {
       this.multipleActiveState = null;
       return;
     }
 
-    const lastSelected = selected[selected.length - 1];
+    const lastSelected: DropdownItem = selected[selected.length - 1];
     const stateName = lastSelected.item_text;
 
-    this.multipleSelectedStates = selected.map((i: any) => i.item_text);
+    this.multipleSelectedStates = selected.map((i: DropdownItem) => i.item_text);
     this.multipleActiveState = stateName;
 
-    this.api.getCountiesByState(lastSelected.item_id).subscribe((res: any) => {
+    this.api.getCountiesByState(lastSelected.item_id).subscribe((res: GetCountiesResponse) => {
       const counties = res.usgeoCounties || [];
 
-      this.countiySubCountyMap[stateName] = counties.map((c: any) => c.countyName);
+      this.countiySubCountyMap[stateName] = counties.map((c: County) => c.countyName);
 
       if (!this.multipleSelectedCounties[stateName]) {
         this.multipleSelectedCounties[stateName] = [];
@@ -217,11 +230,12 @@ export class CountiesComponent implements OnInit {
     }
   }
 
-  onMultipleToggleChange(event: any) {
-    this.multipleFullStateMode = event.target.checked;
+  onMultipleToggleChange(event: Event) {
+    const checked = (event.target as HTMLInputElement).checked;
+    this.multipleFullStateMode = checked;
 
     this.multipleSelectedStates.forEach((state) => {
-      this.multipleSelectedCounties[state] = this.multipleFullStateMode
+      this.multipleSelectedCounties[state] = checked
         ? [...(this.countiySubCountyMap[state] || [])]
         : [];
     });
@@ -279,7 +293,7 @@ export class CountiesComponent implements OnInit {
     delete this.selectedSubCounties[state];
 
     this.countiesKeyDropDowns.states.selected = this.countiesKeyDropDowns.states.selected.filter(
-      (item: any) => item.item_text !== state,
+      (item: DropdownItem) => item.item_text !== state,
     );
 
     if (this.activeStatesForCounties === state) {
@@ -337,7 +351,7 @@ export class CountiesComponent implements OnInit {
       delete this.multipleSelectedCounties[state];
 
       this.multipleStatesDropdown.selected = this.multipleStatesDropdown.selected.filter(
-        (item: any) => item.item_text !== state,
+        (item: DropdownItem) => item.item_text !== state,
       );
 
       this.multipleActiveState = this.multipleSelectedStates.slice(-1)[0] || null;
