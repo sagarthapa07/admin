@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { NgbDate, NgbDateParserFormatter, NgbDateStruct } from '@ng-bootstrap/ng-bootstrap';
 import { NgbDatepickerModule } from '@ng-bootstrap/ng-bootstrap';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { Header } from '../../shared/component/header/header';
 import { Api } from '../Services/api';
 import { HostListener } from '@angular/core';
@@ -32,6 +32,7 @@ export class CalenderOpportunity {
 
   selectAll = false;
   hoveredDate: NgbDate | null = null;
+  
 
   @HostListener('document:click', ['$event'])
   onClickOutside(event: any) {
@@ -46,11 +47,11 @@ export class CalenderOpportunity {
     public formatter: NgbDateParserFormatter,
     private api: Api,
     private cdr: ChangeDetectorRef,
+    private route: Router,
   ) {}
 
   ngOnInit() {
     this.getData();
-
     const data = localStorage.getItem('searchHistory');
     this.searchHistory = data ? JSON.parse(data) : [];
   }
@@ -250,5 +251,13 @@ export class CalenderOpportunity {
       this.pageIndex = 1;
       this.getData();
     }
+  }
+
+  goToEdit(id: number | undefined) {
+    if (!id) {
+      console.error('ID missing', id);
+      return;
+    }
+    this.route.navigate(['/edit', id]);
   }
 }

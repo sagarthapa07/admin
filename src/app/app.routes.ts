@@ -35,9 +35,8 @@ export const routes: Routes = [
     // canActivate: [AuthGuard]
   },
   {
-    path: 'edit',
-    component: Edit,
-    // canActivate: [AuthGuard]
+    path: 'edit/:id',
+    component: Edit
   },
   {
     path: 'forget',
@@ -51,7 +50,7 @@ export const routes: Routes = [
   },
   {
     path: 'date',
-    component: DateRangePicker,
+    component: DateRangePicker, 
   },
 
 ];

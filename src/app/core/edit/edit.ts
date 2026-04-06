@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { SeoSocialComponent } from '../seo-social/seo-social';
 import { CountiesComponent } from '../counties/counties';
@@ -9,6 +9,8 @@ import { GeoLocationComponent } from '../geo-location/geo-location';
 import { Header } from '../../shared/component/header/header';
 import { FocusGroupsComponent } from '../focus-groups/focus-groups';
 import { CalendarDetails } from '../calendar-details/calendar-details';
+import { Api } from '../Services/api';
+import { GrantDetail, GrantApiResponse } from '../../datatype';
 
 @Component({
   standalone: true,
@@ -40,10 +42,13 @@ export class Edit {
   ];
 
   activeItem = 'Calender Details';
+  grantData: GrantDetail | null = null;
 
   constructor(
     private fb: FormBuilder,
     private router: Router,
+    private route: ActivatedRoute,
+    private api: Api,
   ) {
     this.opportunityForm = this.fb.group({
       title: [''],
@@ -63,6 +68,47 @@ export class Edit {
     });
   }
 
+  ngOnInit() {
+    const id = this.route.snapshot.paramMap.get('id');
+
+    if (id) {
+      this.getGrantDetails(+id);
+    }
+  }
+  getGrantDetails(id: number) {
+    this.api.getGrantById(id).subscribe({
+      next: (res: GrantApiResponse) => {
+        const mapped = this.mapGrantData(res);
+        this.grantData = { ...mapped }; // force change detection
+      },
+    });
+  }
+  formatDate(date: string): string {
+    return date ? date.split('T')[0] : '';
+  }
+  mapGrantData(res: GrantApiResponse): GrantDetail {
+    const data = res.usGrantDataWithURL.grantData;
+    const url = res.usGrantDataWithURL.urlData;
+
+    return {
+      id: data.grantIndex,
+      title: data.grantTitle,
+      friendlyURL: url?.friendlyURLText || '',
+      linkUrl: data.linkURL,
+      postDate: this.formatDate(data.postDate),
+      deadlineDate: this.formatDate(data.deadLineDate),
+      isOngoing: data.onGoingGrants === 1,
+      shortInfo: data.shortIntro,
+      donorType: data.donorType === 'UD' ? 'US Donors' : data.donorType,
+      donorAgency: data.donorAgency,
+      donorAgencyOther: data.donorAgency,
+      grantType: data.grantType?.split('|')[0]?.trim() || '',
+      grantDuration: data.grantDuration?.trim() || '',
+      grantSize: data.grantSize?.trim() || '',
+      status: data.status || '',
+      letterText: data.grantContent || '',
+    };
+  }
   setActive(item: string) {
     this.activeItem = item;
   }

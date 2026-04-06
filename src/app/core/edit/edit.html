@@ -16,8 +16,8 @@
       </button>
     </div>
   </div>
-  <div *ngIf="activeItem === 'Calender Details'">
-    <app-calendar-details></app-calendar-details>
+  <div *ngIf="activeItem === 'Calender Details' && grantData">
+    <app-calendar-details [data]="grantData"></app-calendar-details>
   </div>
   <div *ngIf="activeItem === 'Geo Location'">
     <app-geo-location></app-geo-location>

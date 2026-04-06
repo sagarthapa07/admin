@@ -12,6 +12,7 @@ import {
   GetStatesResponse,
   GetSubEntitiesResponse,
   GetTownshipResponse,
+  GrantApiResponse,
 } from '../../datatype';
 
 @Injectable({
@@ -27,6 +28,11 @@ export class Api {
       payload,
     );
   }
+  getGrantById(id: number): Observable<GrantApiResponse> {
+    return this.http.get<GrantApiResponse>(
+      `https://ang-dnd.fundsforngospremium.com/api/USGrants/GetUSGrantsDetail?id=${id}`,
+    );
+  }
 
   // SearchDonors Api
   searchDonors(donorType: string, searchText: string): Observable<any> {
@@ -36,7 +42,9 @@ export class Api {
   }
 
   getTownShips(): Observable<GetTownshipResponse> {
-    return this.http.get<GetTownshipResponse>('https://ang-dnd.fundsforngospremium.com/api/TownShips/GetTownShips');
+    return this.http.get<GetTownshipResponse>(
+      'https://ang-dnd.fundsforngospremium.com/api/TownShips/GetTownShips',
+    );
   }
 
   getInsularAreas(): Observable<GetInsularResponse> {
@@ -46,11 +54,15 @@ export class Api {
   }
 
   getCities(): Observable<GetCitiesResponse> {
-    return this.http.get<GetCitiesResponse>('https://ang-dnd.fundsforngospremium.com/api/Cities/GetCities');
+    return this.http.get<GetCitiesResponse>(
+      'https://ang-dnd.fundsforngospremium.com/api/Cities/GetCities',
+    );
   }
 
   getStates(): Observable<GetStatesResponse> {
-    return this.http.get<GetStatesResponse>('https://ang-dnd.fundsforngospremium.com/api/States/GetUSStates');
+    return this.http.get<GetStatesResponse>(
+      'https://ang-dnd.fundsforngospremium.com/api/States/GetUSStates',
+    );
   }
 
   //Focus AReas k liye APis USe hori h yha se

@@ -1,4 +1,4 @@
-import { Component, ElementRef, ViewChild, HostListener } from '@angular/core';
+import { Component, ElementRef, ViewChild, HostListener, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   FormBuilder,
@@ -10,6 +10,8 @@ import {
 import { Router } from '@angular/router';
 import { Editor } from '../../shared/component/editor/editor';
 import { Api } from '../Services/api';
+import { Input } from '@angular/core';
+import { GrantDetail } from '../../datatype';
 @Component({
   standalone: true,
   selector: 'app-calendar-details',
@@ -23,16 +25,15 @@ export class CalendarDetails {
   @ViewChild('editorWordCountElement') private editorWordCount!: ElementRef<HTMLDivElement>;
   @ViewChild('issueContainer') issueContainer!: ElementRef;
   @ViewChild('dropdownContainer') dropdownContainer!: ElementRef;
+  @Input() data: GrantDetail | null = null;
 
   key: any;
 
   // public Editor: any;
   public isBrowser = false;
   activeBtn: string = 'calendar';
-
   donorList: any[] = [];
   showDropdown = false;
-
   opportunityForm: FormGroup;
 
   @HostListener('document:mousedown', ['$event'])
@@ -41,7 +42,6 @@ export class CalendarDetails {
       this.showDropdown = false;
     }
   }
-
 
   constructor(
     private fb: FormBuilder,
@@ -98,6 +98,35 @@ export class CalendarDetails {
   setActive(item: string) {
     this.activeItem = item;
   }
+
+  ngOnChanges(changes: SimpleChanges) {
+    console.log('DATA RECEIVED', this.data);
+
+    if (changes['data']?.currentValue) {
+      this.fillForm(changes['data'].currentValue);
+    }
+  }
+
+  fillForm(data: GrantDetail) {
+    this.opportunityForm.patchValue({
+      title: data.title,
+      friendlyURL: data.friendlyURL,
+      linkUrl: data.linkUrl,
+      postDate: data.postDate,
+      deadlineDate: data.deadlineDate,
+      isOngoing: data.isOngoing,
+      shortInfo: data.shortInfo,
+      donorType: data.donorType,
+      donorAgency: data.donorAgency,
+      donorAgencyOther: data.donorAgencyOther,
+      grantType: data.grantType,
+      grantDuration: data.grantDuration,
+      grantSize: data.grantSize,
+      status: data.status,
+      letterText: data.letterText,
+    });
+    this.editorData = data.letterText;
+  }
   public editorData = '';
   goToGeoLocation() {
     this.activeItem = 'Geo Location';
@@ -127,21 +156,17 @@ export class CalendarDetails {
 
     this.api.searchDonors('DU', value).subscribe((res) => {
       console.log(res);
-
-      // 🔥 correct field
       this.donorList = res?.donorsList?.slice(0, 10) || [];
-
       this.showDropdown = true;
     });
   }
   selectDonor(item: any) {
     this.opportunityForm.patchValue({
       donorAgency: item.donorName,
-      donorAgencyOther: item.donorName 
+      donorAgencyOther: item.donorName,
     });
 
     this.donorList = [];
     this.showDropdown = false;
   }
-  
 }

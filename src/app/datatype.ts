@@ -1,89 +1,112 @@
+// ================== GRANT (UI MODEL) ==================
+export interface GrantDetail {
+  id: number;
+  title: string;
+  friendlyURL: string;
+  linkUrl: string;
+  postDate: string;
+  deadlineDate: string;
+  isOngoing: boolean;
+  shortInfo: string;
+  donorType: string;
+  donorAgency: string;
+  donorAgencyOther: string;
+  grantType: string;
+  grantDuration: string;
+  grantSize: string;
+  status: string;
+  letterText: string;
+}
+
+// ================== GRANT API RESPONSE ==================
+export interface GrantApiResponse {
+  usGrantDataWithURL: {
+    grantData: {
+      grantIndex: number;
+      grantTitle: string;
+      linkURL: string;
+      postDate: string;
+      deadLineDate: string;
+      shortIntro: string;
+      donorType: string;
+      donorAgency: string;
+      grantType: string;
+      grantSize: string;
+      grantDuration: string;
+      status: string;
+      grantContent: string;
+      onGoingGrants: number;
+    };
+    urlData: {
+      friendlyURLText: string;
+    };
+  };
+}
+
+// ================== GRANTS LIST ==================
+export interface GrantListItem {
+  grantIndex: number;
+  grantTitle: string;
+  postDate: string;
+  deadLineDate: string;
+}
+
+// ================== COMMON ==================
 export interface DropdownItem {
   item_id: number;
   item_text: string;
 }
+
+// ================== STATES ==================
 export interface State {
   stateIndex: number;
   stateName: string;
 }
+
 export interface GetStatesResponse {
-  states: State[];
+  usStates: State[];
 }
+
+// ================== COUNTIES ==================
 export interface County {
   countyName: string;
 }
+
 export interface GetCountiesResponse {
   usgeoCounties: County[];
 }
+
+// ================== CITIES ==================
 export interface City {
+  cityIndex: number;
   cityName: string;
 }
+
+export interface GetCitiesResponse {
+  usCities: City[];
+}
+
+// ================== TOWNSHIP ==================
 export interface Township {
+  townshipIndex: number;
   townshipName: string;
 }
+
+export interface GetTownshipResponse {
+  usTownships: Township[];
+}
+
+// ================== INSULAR ==================
 export interface InsularArea {
-  insularAreaName: string;
-}
-export interface FocusArea {
-  issueId: number;
-  issueName: string;
-}
-export interface FocusSubArea {
-  subIssueId: number;
-  subIssueName: string;
-}
-export interface Beneficiary {
-  beneficiaryId: number;
-  beneficiaryName: string;
-}
-export interface Entity {
-  entId: number;
-  entName: string;
-}
-export interface SubEntity {
-  subEntId: number;
-  subEntName: string;
-}
-export interface Grant {
-  id: number;
-  title: string;
-  postDate: string;
-}
-export interface GetGrantsResponse {
-  data: Grant[];
-  totalRecords: number;
-}
-export interface DropdownItem {
-  item_id: number;
-  item_text: string;
+  areaIndex: number;
+  areaName: string;
 }
 
-export interface Beneficiary {
-  beneficiaryIndex: number;
-  beneficiaryName: string;
+export interface GetInsularResponse {
+  usInsularAreas: InsularArea[];
 }
 
-export interface GetBeneficiariesResponse {
-  tempUSBeneficiaries: Beneficiary[];
-}
-
-export interface Entity {
-  entIndex: number;
-  entName: string;
-}
-
-export interface GetEntitiesResponse {
-  usEntities: Entity[];
-}
-
-export interface SubEntity {
-  subEntId: number;
-  subEntName: string;
-}
-
-export interface GetSubEntitiesResponse {
-  subEntities: SubEntity[];
-}
+// ================== FOCUS AREA ==================
 export interface FocusArea {
   issueIndex: number;
   issueName: string;
@@ -94,6 +117,7 @@ export interface GetFocusAreasResponse {
   usFocusAreas: FocusArea[];
 }
 
+// ================== FOCUS SUB AREA ==================
 export interface FocusSubArea {
   subIssueIndex: number;
   subIssueName: string;
@@ -104,38 +128,32 @@ export interface GetFocusSubAreasResponse {
   myList: FocusSubArea[];
 }
 
-export interface City {
-  cityIndex: number;
-  cityName: string;
+// ================== BENEFICIARY ==================
+export interface Beneficiary {
+  beneficiaryIndex: number;
+  beneficiaryName: string;
 }
 
-export interface GetCitiesResponse {
-  usCities: City[];
+export interface GetBeneficiariesResponse {
+  tempUSBeneficiaries: Beneficiary[];
 }
 
-export interface Township {
-  townshipIndex: number;
-  townshipName: string;
+// ================== ENTITY ==================
+export interface Entity {
+  entIndex: number;
+  entName: string;
 }
 
-export interface GetTownshipResponse {
-  usTownships: Township[];
+export interface GetEntitiesResponse {
+  usEntities: Entity[];
 }
 
-export interface InsularArea {
-  areaIndex: number;
-  areaName: string;
+// ================== SUB ENTITY ==================
+export interface SubEntity {
+  subEntId: number;
+  subEntName: string;
 }
 
-export interface GetInsularResponse {
-  usInsularAreas: InsularArea[];
-}
-
-export interface State {
-  stateIndex: number;
-  stateName: string;
-}
-
-export interface GetStatesResponse {
-  usStates: State[];
+export interface GetSubEntitiesResponse {
+  subEntities: SubEntity[];
 }

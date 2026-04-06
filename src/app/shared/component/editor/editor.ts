@@ -1,7 +1,9 @@
-import { Component,signal } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { Router, NavigationEnd, RouterOutlet } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CKEditorModule } from '@ckeditor/ckeditor5-angular';
+import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
+import { forwardRef } from '@angular/core';
 import {
   ClassicEditor,
   Alignment,
@@ -58,19 +60,28 @@ import {
   TodoList,
   Underline,
   Undo,
-  type EditorConfig
+  type EditorConfig,
 } from 'ckeditor5';
-import {ViewEncapsulation} from'@angular/core';
+import { ViewEncapsulation } from '@angular/core';
 
 @Component({
   selector: 'app-editor',
   imports: [CKEditorModule, FormsModule],
   templateUrl: './editor.html',
   styleUrl: './editor.scss',
+  providers: [
+    {
+      provide: NG_VALUE_ACCESSOR,
+      useExisting: forwardRef(() => Editor),
+      multi: true,
+    },
+  ],
 })
-export class Editor {
+export class Editor implements ControlValueAccessor {
   public Editor = ClassicEditor;
-  public editorData = "";
+  public editorData = '';
+  onChange: any = () => {};
+  onTouched: any = () => {};
 
   public config: EditorConfig = {
     licenseKey: 'GPL',
@@ -132,7 +143,7 @@ export class Editor {
       Undo,
     ],
 
-   toolbar: {
+    toolbar: {
       shouldNotGroupWhenFull: true,
       items: [
         // ROW 1
@@ -189,7 +200,7 @@ export class Editor {
         { model: 'heading2', view: 'h2', title: 'Heading 2', class: 'ck-heading_heading2' },
         { model: 'heading3', view: 'h3', title: 'Heading 3', class: 'ck-heading_heading3' },
         { model: 'heading4', view: 'h4', title: 'Heading 4', class: 'ck-heading_heading4' },
-      ]
+      ],
     },
 
     fontFamily: {
@@ -202,14 +213,14 @@ export class Editor {
         'Tahoma, Geneva, sans-serif',
         'Times New Roman, Times, serif',
         'Trebuchet MS, Helvetica, sans-serif',
-        'Verdana, Geneva, sans-serif'
+        'Verdana, Geneva, sans-serif',
       ],
-      supportAllValues: true
+      supportAllValues: true,
     },
 
     fontSize: {
       options: [8, 9, 10, 11, 12, 'default', 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72],
-      supportAllValues: true
+      supportAllValues: true,
     },
 
     image: {
@@ -220,26 +231,29 @@ export class Editor {
         '|',
         'imageCaption',
         '|',
-        'resizeImage'
-      ]
+        'resizeImage',
+      ],
     },
 
     table: {
       contentToolbar: [
-        'tableColumn', 'tableRow', 'mergeTableCells',
+        'tableColumn',
+        'tableRow',
+        'mergeTableCells',
         '|',
-        'tableProperties', 'tableCellProperties',
+        'tableProperties',
+        'tableCellProperties',
         '|',
-        'toggleTableCaption'
-      ]
+        'toggleTableCaption',
+      ],
     },
 
     list: {
       properties: {
         styles: true,
         startIndex: true,
-        reversed: true
-      }
+        reversed: true,
+      },
     },
 
     link: {
@@ -250,8 +264,8 @@ export class Editor {
           mode: 'manual',
           label: 'Downloadable',
           attributes: {
-            download: 'file'
-          }
+            download: 'file',
+          },
         },
         openInNewTab: {
           mode: 'manual',
@@ -259,26 +273,23 @@ export class Editor {
           defaultValue: true,
           attributes: {
             target: '_blank',
-            rel: 'noopener noreferrer'
-          }
-        }
-      }
+            rel: 'noopener noreferrer',
+          },
+        },
+      },
     },
 
     htmlSupport: {
-      allow: [
-        { name: /.*/, attributes: true, classes: true, styles: true }
-      ]
+      allow: [{ name: /.*/, attributes: true, classes: true, styles: true }],
     },
 
     style: {
       definitions: [
         { name: 'Article category', element: 'h3', classes: ['category'] },
         { name: 'Info box', element: 'p', classes: ['info-box'] },
-      ]
-    }
+      ],
+    },
   };
-
 
   protected readonly title = signal('admin');
 
@@ -290,4 +301,23 @@ export class Editor {
       }
     });
   }
+
+  writeValue(value: any): void {
+    this.editorData = value || '';
+  }
+
+  registerOnChange(fn: any): void {
+    this.onChange = fn;
+  }
+
+  registerOnTouched(fn: any): void {
+    this.onTouched = fn;
+  }
+
+  onEditorChange(event: any) {
+  const data = event.editor.getData();
+
+  this.editorData = data;
+  this.onChange(data); 
+}
 }

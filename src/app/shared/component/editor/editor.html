@@ -2,6 +2,8 @@
   <ckeditor
     [editor]="Editor"
     [config]="config"
-    [(ngModel)]="editorData">
+    [data]="editorData"
+    (change)="onEditorChange($event)"
+  >
   </ckeditor>
 </div>

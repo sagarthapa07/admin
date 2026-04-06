@@ -115,7 +115,7 @@
                 {{ item.status }}
               </span>
             </td>
-            <td class="icon-cell" routerLink="/edit">
+            <td class="icon-cell" (click)="goToEdit(item.grantIndex)">
               <i class="bi bi-pencil-square"></i>
             </td>
             <td class="icon-cell">
@@ -185,14 +185,3 @@
     </div>
   </div>
 </section>
-
-<!-- <div ngbDropdown class="d-inline-block">
-  <button type="button" class="btn btn-outline-primary" id="dropdownBasic1" ngbDropdownToggle>
-    Toggle dropdown
-  </button>
-  <div ngbDropdownMenu aria-labelledby="dropdownBasic1">
-    <button ngbDropdownItem>Action - 1</button>
-    <button ngbDropdownItem>Another Action</button>
-    <button ngbDropdownItem>Something else is here</button>
-  </div>
-</div> -->

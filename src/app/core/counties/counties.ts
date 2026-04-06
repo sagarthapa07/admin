@@ -91,7 +91,7 @@ export class CountiesComponent implements OnInit {
     this.api.getAllStates().subscribe((res: GetStatesResponse) => {
       console.log('API RESPONSE:', res);
 
-      const states = res.states || [];
+      const states = res.usStates || [];
 
       this.countiesKeyDropDowns.states.data = states.map((s: State) => ({
         item_id: s.stateIndex,

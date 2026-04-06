@@ -62,7 +62,7 @@ import {
 } from 'ckeditor5';
 import {ViewEncapsulation} from'@angular/core';
 
-import 'ckeditor5/ckeditor5.css';
+
 
 @Component({
   selector: 'app-root',

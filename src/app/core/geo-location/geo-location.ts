@@ -101,10 +101,8 @@ export class GeoLocationComponent implements OnInit {
   geoKeys: GeoKey[] = [];
 
   ngOnInit(): void {
-    console.log('aagya hai data ');
     this.loadGeoData();
     this.geoKeys = Object.keys(this.geoDropdowns) as GeoKey[];
-    console.log('jaldi aagya hai ');
   }
 
   loadGeoData() {
