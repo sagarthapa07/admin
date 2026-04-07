@@ -19,8 +19,8 @@
   <div *ngIf="activeItem === 'Calender Details' && grantData">
     <app-calendar-details [data]="grantData"></app-calendar-details>
   </div>
-  <div *ngIf="activeItem === 'Geo Location'">
-    <app-geo-location></app-geo-location>
+  <div *ngIf="activeItem === 'Geo Location' && grantData">
+    <app-geo-location ></app-geo-location>
   </div>
   <div *ngIf="activeItem === 'Focus Areas'">
     <app-focus-area></app-focus-area>

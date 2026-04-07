@@ -76,10 +76,6 @@ export class CalendarDetails {
     return !!(control && control.invalid && (control.dirty || control.touched));
   }
 
-  onSave() {
-    console.log('Save clicked', this.opportunityForm.value);
-  }
-
   gotoPreview() {
     this.router.navigate(['/preview']);
   }
@@ -129,6 +125,7 @@ export class CalendarDetails {
   }
   public editorData = '';
   goToGeoLocation() {
+    this.onSave();
     this.activeItem = 'Geo Location';
   }
   goToFocusAreas() {
@@ -168,5 +165,78 @@ export class CalendarDetails {
 
     this.donorList = [];
     this.showDropdown = false;
+  }
+  formatDateISO(date: string): string {
+    return new Date(date).toISOString();
+  }
+
+  getDateNumber(date: string): number {
+    const d = new Date(date);
+    return Number(
+      `${d.getFullYear()}${(d.getMonth() + 1)
+        .toString()
+        .padStart(2, '0')}${d.getDate().toString().padStart(2, '0')}`,
+    );
+  }
+
+  onSave() {
+    const form = this.opportunityForm.value;
+
+    const payload = {
+      userIndex: 5,
+      userEmail: 'ritu@fundsforngos.org',
+
+      grantData: {
+        grantIndex: this.data?.id,
+
+        grantTitle: form.title,
+        linkURL: form.linkUrl,
+
+        postDate: this.formatDateISO(form.postDate),
+        pdValue: this.getDateNumber(form.postDate),
+
+        deadLineDate: this.formatDateISO(form.deadlineDate),
+        ddValue: this.getDateNumber(form.deadlineDate),
+
+        shortIntro: form.shortInfo,
+
+        donorType: 'UD',
+        donorIndex: 0,
+        donorAgency: form.donorAgency,
+
+        grantType: form.grantType,
+        grantSize: form.grantSize,
+
+        // 🔥🔥🔥 YAHI DALNA HAI
+        grantLogoImage: this.data?.img || 'default.jpg',
+
+        onGoingGrants: form.isOngoing ? 1 : 0,
+
+        status: form.status || 'Draft',
+
+        grantContent: form.letterText,
+
+        grantDuration: form.grantDuration,
+
+        stCtType: '',
+        stateString: '',
+        countyString: '',
+        issueString: '',
+        entityString: '',
+        viewCount: 0,
+      },
+
+      urlData: {
+        urlIndex: 0,
+        refIndex: this.data?.id,
+        urlRecordType: 'UG',
+        friendlyURLText: form.friendlyURL,
+      },
+    };
+
+    this.api.updateGrant(this.data?.id!, payload).subscribe({
+      next: (res) => console.log('SUCCESS', res),
+      error: (err) => console.log('ERROR', err),
+    });
   }
 }

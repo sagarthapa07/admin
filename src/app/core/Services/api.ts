@@ -9,6 +9,10 @@ import {
   GetFocusAreasResponse,
   GetFocusSubAreasResponse,
   GetInsularResponse,
+  GetSelectedCitiesResponse,
+  GetSelectedInsularResponse,
+  GetSelectedStatesResponse,
+  GetSelectedTownshipsResponse,
   GetStatesResponse,
   GetSubEntitiesResponse,
   GetTownshipResponse,
@@ -34,12 +38,22 @@ export class Api {
     );
   }
 
+  updateGrant(id: number, payload: any) {
+    return this.http.post(
+      `https://ang-dnd.fundsforngospremium.com/api/USGrants/UpdateUSGrants?id=${id}`,
+      payload,
+    );
+  }
+
   // SearchDonors Api
+
   searchDonors(donorType: string, searchText: string): Observable<any> {
     return this.http.get<any>(
       `https://adminapi.grantsforus.app/api/USDonors/GetUSDonorsByType?donorType=${donorType}&searchText=${searchText}`,
     );
   }
+
+  // GEO Location APis here
 
   getTownShips(): Observable<GetTownshipResponse> {
     return this.http.get<GetTownshipResponse>(
@@ -62,6 +76,30 @@ export class Api {
   getStates(): Observable<GetStatesResponse> {
     return this.http.get<GetStatesResponse>(
       'https://ang-dnd.fundsforngospremium.com/api/States/GetUSStates',
+    );
+  }
+
+  getSelectedCities(grantId: number): Observable<GetSelectedCitiesResponse> {
+    return this.http.get<GetSelectedCitiesResponse>(
+      `https://ang-dnd.fundsforngospremium.com/api/USGrantCities/ListCitiesForSelectedGrant?GrantID=${grantId}`,
+    );
+  }
+
+  getSelectedStates(grantId: number): Observable<GetSelectedStatesResponse> {
+    return this.http.get<GetSelectedStatesResponse>(
+      `https://ang-dnd.fundsforngospremium.com/api/USGrantStates/ListGeoStatesForSelectedGrant?GrantID=${grantId}`,
+    );
+  }
+
+  getSelectedTownships(grantId: number): Observable<GetSelectedTownshipsResponse> {
+    return this.http.get<GetSelectedTownshipsResponse>(
+      `https://ang-dnd.fundsforngospremium.com/api/USGrantTownships/ListTownshipsForSelectedGrant?GrantID=${grantId}`,
+    );
+  }
+
+  getSelectedInsular(grantId: number): Observable<GetSelectedInsularResponse> {
+    return this.http.get<GetSelectedInsularResponse>(
+      `https://ang-dnd.fundsforngospremium.com/api/USGrantInsularAreas/ListInsularAreasForSelectedGrant?GrantID=${grantId}`,
     );
   }
 

@@ -5,15 +5,7 @@ import { Router } from '@angular/router';
 import { IDropdownSettings, NgMultiSelectDropDownModule } from 'ng-multiselect-dropdown';
 import { Api } from '../Services/api';
 import {
-  City,
   DropdownItem,
-  GetCitiesResponse,
-  GetInsularResponse,
-  GetStatesResponse,
-  GetTownshipResponse,
-  InsularArea,
-  Township,
-  State,
 } from '../../datatype';
 
 type GeoKey = 'cities' | 'township' | 'insular' | 'states';
@@ -105,40 +97,86 @@ export class GeoLocationComponent implements OnInit {
     this.geoKeys = Object.keys(this.geoDropdowns) as GeoKey[];
   }
 
-  loadGeoData() {
+  loadGeoData(callback?: () => void) {
+    let completed = 0;
+
+    const done = () => {
+      completed++;
+      if (completed === 4 && callback) {
+        callback();
+      }
+    };
+
     // Cities
-    this.api.getCities().subscribe((res: GetCitiesResponse) => {
-      this.geoDropdowns.cities.data = res.usCities.map((item: City) => ({
-        item_id: item.cityIndex,
-        item_text: item.cityName.trim(),
+    this.api.getCities().subscribe((res) => {
+      this.geoDropdowns.cities.data = res.usCities.map((c) => ({
+        item_id: c.cityIndex,
+        item_text: c.cityName.trim(),
       }));
+      done();
+    });
+
+    // States
+    this.api.getStates().subscribe((res) => {
+      this.geoDropdowns.states.data = res.usStates.map((s) => ({
+        item_id: s.stateIndex,
+        item_text: s.stateName.trim(),
+      }));
+      done();
     });
 
     // Township
-    this.api.getTownShips().subscribe((res: GetTownshipResponse) => {
-      this.geoDropdowns.township.data = res.usTownships.map((item: Township) => ({
-        item_id: item.townshipIndex,
-        item_text: item.townshipName.trim(),
+    this.api.getTownShips().subscribe((res) => {
+      this.geoDropdowns.township.data = res.usTownships.map((t) => ({
+        item_id: t.townshipIndex,
+        item_text: t.townshipName.trim(),
       }));
+      done();
     });
 
     // Insular
-    this.api.getInsularAreas().subscribe((res: GetInsularResponse) => {
-      this.geoDropdowns.insular.data = res.usInsularAreas.map((item: InsularArea) => ({
-        item_id: item.areaIndex,
-        item_text: item.areaName.trim(),
+    this.api.getInsularAreas().subscribe((res) => {
+      this.geoDropdowns.insular.data = res.usInsularAreas.map((i) => ({
+        item_id: i.areaIndex,
+        item_text: i.areaName.trim(),
+      }));
+      done();
+    });
+  }
+
+  loadSelectedGeoData(grantId: number) {
+    // Cities
+    this.api.getSelectedCities(grantId).subscribe((res) => {
+      this.geoDropdowns.cities.selected = res.cities.map((c) => ({
+        item_id: c.cityIndex,
+        item_text: c.cityName.trim(),
       }));
     });
 
     // States
-    this.api.getStates().subscribe((res: GetStatesResponse) => {
-      this.geoDropdowns.states.data = res.usStates.map((item: State) => ({
-        item_id: item.stateIndex,
-        item_text: item.stateName.trim(),
+    this.api.getSelectedStates(grantId).subscribe((res) => {
+      this.geoDropdowns.states.selected = res.states.map((s) => ({
+        item_id: s.stateIndex,
+        item_text: s.stateName.trim(),
+      }));
+    });
+
+    // Township
+    this.api.getSelectedTownships(grantId).subscribe((res) => {
+      this.geoDropdowns.township.selected = res.townships.map((t) => ({
+        item_id: t.townshipIndex,
+        item_text: t.townshipName.trim(),
+      }));
+    });
+
+    // Insular
+    this.api.getSelectedInsular(grantId).subscribe((res) => {
+      this.geoDropdowns.insular.selected = res.insularAreas.map((i) => ({
+        item_id: i.areaIndex,
+        item_text: i.areaName.trim(),
       }));
     });
   }
-
   goToFocusAreas() {
     this.router.navigate(['/focus-areas']);
   }

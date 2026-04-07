@@ -11,7 +11,7 @@ import { FocusGroupsComponent } from '../focus-groups/focus-groups';
 import { CalendarDetails } from '../calendar-details/calendar-details';
 import { Api } from '../Services/api';
 import { GrantDetail, GrantApiResponse } from '../../datatype';
-
+import { Input } from '@angular/core';
 @Component({
   standalone: true,
   selector: 'app-example',
@@ -43,6 +43,7 @@ export class Edit {
 
   activeItem = 'Calender Details';
   grantData: GrantDetail | null = null;
+  @Input() grantId?: number;
 
   constructor(
     private fb: FormBuilder,
@@ -52,7 +53,7 @@ export class Edit {
   ) {
     this.opportunityForm = this.fb.group({
       title: [''],
-      linkUrl: [''],
+      linkUrl: [''],  
       postDate: [''],
       deadlineDate: [''],
       isOngoing: [false],
@@ -103,12 +104,28 @@ export class Edit {
       donorAgency: data.donorAgency,
       donorAgencyOther: data.donorAgency,
       grantType: data.grantType?.split('|')[0]?.trim() || '',
-      grantDuration: data.grantDuration?.trim() || '',
+      grantDuration: this.normalizeDuration(data.grantDuration),
       grantSize: data.grantSize?.trim() || '',
       status: data.status || '',
       letterText: data.grantContent || '',
+      img: data.grantLogoImage || '',
     };
   }
+
+  normalizeDuration(value: string): string {
+    if (!value) return '';
+    const clean = value.trim().toLowerCase();
+    if (clean.includes('less than 1')) return 'Less than 1 Year';
+    if (clean.includes('1 year')) return '1 Year';
+    if (clean.includes('2 year')) return '2 Year';
+    if (clean.includes('3 year')) return '3 Year';
+    if (clean.includes('4 year')) return '4 Year';
+    if (clean.includes('5 year')) return '5 Year';
+    if (clean.includes('5–10')) return '5–10 Years';
+    if (clean.includes('not mentioned')) return 'Grant Duration Not Mentioned';
+    return '';
+  }
+
   setActive(item: string) {
     this.activeItem = item;
   }

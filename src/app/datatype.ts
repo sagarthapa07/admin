@@ -16,6 +16,7 @@ export interface GrantDetail {
   grantSize: string;
   status: string;
   letterText: string;
+  img: string;
 }
 
 // ================== GRANT API RESPONSE ==================
@@ -29,6 +30,7 @@ export interface GrantApiResponse {
       deadLineDate: string;
       shortIntro: string;
       donorType: string;
+      grantLogoImage: string;
       donorAgency: string;
       grantType: string;
       grantSize: string;
@@ -37,7 +39,7 @@ export interface GrantApiResponse {
       grantContent: string;
       onGoingGrants: number;
     };
-    urlData: {
+    urlData?: {
       friendlyURLText: string;
     };
   };
@@ -156,4 +158,47 @@ export interface SubEntity {
 
 export interface GetSubEntitiesResponse {
   subEntities: SubEntity[];
+}
+
+// ================== SELECTED GEO ==================
+
+export interface SelectedCity {
+  cityIndex: number;
+  cityName: string;
+}
+
+export interface GetSelectedCitiesResponse {
+  cities: SelectedCity[];
+}
+
+export interface SelectedState {
+  stateIndex: number;
+  stateName: string;
+}
+
+export interface GetSelectedStatesResponse {
+  states: SelectedState[];
+}
+
+export interface SelectedTownship {
+  townshipIndex: number;
+  townshipName: string;
+}
+
+export interface GetSelectedTownshipsResponse {
+  townships: SelectedTownship[];
+}
+
+export interface SelectedInsular {
+  areaIndex: number;
+  areaName: string;
+}
+
+export interface GetSelectedInsularResponse {
+  insularAreas: SelectedInsular[];
+}
+export interface GeoDropdown {
+  label: string;
+  data: DropdownItem[];
+  selected: DropdownItem[];
 }
