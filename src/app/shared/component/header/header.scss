@@ -3,23 +3,25 @@
 }
 
 .logo {
-  margin-top: 12px;
-  transition: opacity 0.3s ease;
   position: absolute;
+  transition: opacity 0.3s ease;
 }
 
 /* Default (sidebar chhota) */
 
 .small-logo {
   opacity: 1;
-  height: 30px;
-  width: 18px;
+  width: 40px;
+  height: 40px;
+  margin-left: 15px;
   filter: invert(42%) sepia(93%) saturate(1352%) hue-rotate(90deg) brightness(70%) contrast(90%);
 }
 
 .big-logo {
+  height: 40px;
   opacity: 0;
-  height: 30px;
+  // position: absolute;
+  margin-right: 60px;
 }
 
 .sidebar:hover .small-logo {
@@ -82,8 +84,13 @@
   justify-content: center;
 }
 
-.sidebar .image-text img {
-  width: 40px;
+
+.image-text {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 60px;
+  position: relative;
 }
 
 .sidebar header .image-text {
@@ -138,7 +145,7 @@
 
 .sidebar ul {
   padding: 0;
-  margin-top: 20px;
+  margin-top: 10px;
 }
 
 .sidebar li {
@@ -263,7 +270,7 @@
 .content .home .text {
   font-size: 13px;
   color: var(--primary-color-light);
-  padding-left:10px ;
+  padding-left: 10px;
 }
 
 .content .home .text span:hover {
@@ -274,4 +281,12 @@
   position: absolute;
   bottom: 20px;
   left: 50;
+}
+.breadcrumb span {
+  cursor: pointer;
+}
+
+.breadcrumb span:last-child {
+  font-weight: bold;
+  color: var(--primary-color);
 }

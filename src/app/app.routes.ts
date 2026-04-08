@@ -11,15 +11,11 @@ import { Dashboard } from './core/dashboard/dashboard';
 export const routes: Routes = [
   { path: '', redirectTo: '/login', pathMatch: 'full' },
 
-
-// {
-//   path: 'dashboard',
-//   loadComponent: () => import('./core/dashboard/dashboard').then(m => m.Dashboard),
-//   // canActivate: [AuthGuard] 
-// },
-
-
-
+  // {
+  //   path: 'dashboard',
+  //   loadComponent: () => import('./core/dashboard/dashboard').then(m => m.Dashboard),
+  //   // canActivate: [AuthGuard]
+  // },
 
   {
     path: 'login',
@@ -28,29 +24,31 @@ export const routes: Routes = [
   {
     path: 'dashboard',
     component: Dashboard,
+    data: { breadcrumb: 'Dashboard' },
   },
   {
     path: 'calendar-opportunity',
     component: CalenderOpportunity,
+    data: { breadcrumb: 'calendar-opportunity' },
     // canActivate: [AuthGuard]
   },
   {
     path: 'edit/:id',
-    component: Edit
+    component: Edit,
+    data: { breadcrumb: 'edit' },
   },
   {
     path: 'forget',
     component: ForgetPass,
-    canActivate: [AuthGuard]
+    canActivate: [AuthGuard],
   },
   {
     path: 'preview',
     component: Preview,
-    // canActivate: [AuthGuard]  
+    // canActivate: [AuthGuard]
   },
   {
     path: 'date',
-    component: DateRangePicker, 
+    component: DateRangePicker,
   },
-
 ];

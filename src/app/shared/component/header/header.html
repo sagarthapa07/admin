@@ -107,11 +107,13 @@
 
 <div class="content">
   <section class="home">
-    <div class="text">
-      <span class="" routerLink="/dashboard">
-        <i class="fa-regular fa-house"></i>
-        home/
-      </span>
+    <div class="breadcrumb">
+      <span routerLink="/dashboard"> <i class="fa-regular fa-house"></i> Home </span>
+
+      <ng-container *ngFor="let crumb of breadcrumbs">
+        /
+        <span [routerLink]="crumb.url">{{ crumb.label }}</span>
+      </ng-container>
     </div>
   </section>
 </div>
