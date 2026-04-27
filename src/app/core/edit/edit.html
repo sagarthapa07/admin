@@ -19,18 +19,23 @@
   <div *ngIf="activeItem === 'Calender Details' && grantData">
     <app-calendar-details [data]="grantData"></app-calendar-details>
   </div>
+
   <div *ngIf="activeItem === 'Geo Location' && grantData">
-    <app-geo-location ></app-geo-location>
+    <app-geo-location [grantId]="grantData.id"></app-geo-location>
   </div>
-  <div *ngIf="activeItem === 'Focus Areas'">
-    <app-focus-area></app-focus-area>
+
+  <div *ngIf="activeItem === 'Focus Areas' && grantData">
+    <app-focus-area [grantId]="grantData.id"></app-focus-area>
   </div>
+
   <div *ngIf="activeItem === 'Focus Groups'">
     <app-focus-groups></app-focus-groups>
   </div>
+
   <div *ngIf="activeItem === 'Counties'">
     <app-counties></app-counties>
   </div>
+
   <div *ngIf="activeItem === 'Seo/Social Media'">
     <app-seo-social></app-seo-social>
   </div>

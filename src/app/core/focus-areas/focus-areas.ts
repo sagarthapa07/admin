@@ -10,7 +10,10 @@ import {
   FocusSubArea,
   GetFocusAreasResponse,
   GetFocusSubAreasResponse,
+  SaveFocusAreaRow,
+  SaveFocusAreasPayload,
 } from '../../datatype';
+import { Input } from '@angular/core';
 
 @Component({
   selector: 'app-focus-area',
@@ -21,6 +24,7 @@ import {
 })
 export class FocusAreaComponent implements OnInit {
   @ViewChild('issueContainer') issueContainer!: ElementRef;
+  @Input() grantId?: number;
 
   issues: Issue[] = [];
   activeIssue: Issue | null = null;
@@ -28,6 +32,7 @@ export class FocusAreaComponent implements OnInit {
   selectedMap = new Map<number, number[]>();
   showPasteModal = false;
   pasteText = '';
+  selectedNames = new Map<number, { id: number; name: string }[]>();
 
   constructor(
     private router: Router,
@@ -57,57 +62,98 @@ export class FocusAreaComponent implements OnInit {
 
   loadFocusAreas() {
     this.api.getFocusAreas().subscribe({
-      next: async (res: GetFocusAreasResponse) => {
+      next: (res) => {
         if (res.successCode === 1) {
-          this.issues = res.usFocusAreas.map((item: FocusArea) => ({
+          this.issues = res.usFocusAreas.map((item) => ({
             id: item.issueIndex,
             name: item.issueName,
             subIssues: [],
+            loaded: false,
           }));
 
-          for (const issue of this.issues) {
-            try {
-              const subRes: GetFocusSubAreasResponse = await lastValueFrom(
-                this.api.getFocusSubAreas(issue.id),
-              );
-
-              if (subRes.successCode === 1) {
-                issue.subIssues = subRes.myList.map((sub: FocusSubArea) => ({
-                  id: sub.subIssueIndex,
-                  name: sub.subIssueName,
-                }));
-              }
-            } catch (err) {
-              console.error('SubIssue load error:', err);
-            }
+          if (this.grantId) {
+            this.loadSelectedFocusAreas(this.grantId);
           }
         }
       },
     });
   }
+  loadSelectedFocusAreas(grantId: number): void {
+    this.api.getSelectedFocusAreas(grantId).subscribe({
+      next: (res) => {
+        this.selectedMap.clear();
+        this.selectedNames.clear();
+
+        res.tempUSGrantFocusAreas.forEach((item) => {
+          // ids
+          const ids = this.selectedMap.get(item.issueIndex) || [];
+          ids.push(item.subIssueIndex);
+          this.selectedMap.set(item.issueIndex, ids);
+
+          // names
+          const names = this.selectedNames.get(item.issueIndex) || [];
+
+          names.push({
+            id: item.subIssueIndex,
+            name: item.subIssueName.trim(),
+          });
+
+          this.selectedNames.set(item.issueIndex, names);
+        });
+      },
+    });
+  }
+
   onLeaveIssue() {
     if (this.hoverTimer !== undefined) {
       clearTimeout(this.hoverTimer);
     }
   }
 
-  onClickIssue(issue: Issue) {
+  loadSubIssues(issue: any) {
+    this.api.getFocusSubAreas(issue.id).subscribe({
+      next: (res) => {
+        if (res.successCode === 1) {
+          issue.subIssues = res.myList.map((sub) => ({
+            id: sub.subIssueIndex,
+            name: sub.subIssueName,
+          }));
+
+          issue.loaded = true;
+        }
+      },
+      error: (err) => {
+        console.error(err);
+      },
+    });
+  }
+
+  onClickIssue(issue: any) {
     if (this.hoverTimer !== undefined) {
       clearTimeout(this.hoverTimer);
     }
-    this.activeIssue = issue;
-  }
 
+    this.activeIssue = issue;
+
+    if (!issue.loaded) {
+      this.loadSubIssues(issue);
+    }
+  }
+  changedMap = new Map<number, number[]>();
   toggleSub(issue: Issue, sub: SubIssue) {
     const selected = this.selectedMap.get(issue.id) || [];
+    const changed = this.changedMap.get(issue.id) || [];
 
     if (selected.includes(sub.id)) {
-      this.selectedMap.set(
-        issue.id,
-        selected.filter((id) => id !== sub.id),
-      );
+      const updated = selected.filter((id) => id !== sub.id);
+      this.selectedMap.set(issue.id, updated);
     } else {
       this.selectedMap.set(issue.id, [...selected, sub.id]);
+    }
+
+    // changed map me save karo
+    if (!changed.includes(sub.id)) {
+      this.changedMap.set(issue.id, [...changed, sub.id]);
     }
   }
 
@@ -140,18 +186,53 @@ export class FocusAreaComponent implements OnInit {
     return (this.selectedMap.get(issue.id)?.length || 0) > 0;
   }
 
-  saveSelectedIssues() {
-    const payload: { issueIndex: number; subIssueIndexes: number[] }[] = [];
+  saveSelectedIssues(): void {
+    if (!this.grantId) {
+      alert('Grant ID missing');
+      return;
+    }
+    const rows: SaveFocusAreaRow[] = [];
 
-    this.selectedMap.forEach((subIds, issueId) => {
-      payload.push({
-        issueIndex: issueId,
-        subIssueIndexes: subIds,
+    this.changedMap.forEach((subIds, issueId) => {
+      subIds.forEach((subId) => {
+        rows.push({
+          grantIndex: this.grantId!,
+          subIssueIndex: subId,
+          subIssueName: this.getSubIssueName(issueId, subId),
+          issueIndex: issueId,
+          issueName: this.getIssueName(issueId),
+          userIndex: null,
+          userEmail: null,
+        });
       });
     });
 
-    console.log('FINAL PAYLOAD:', payload);
-    this.activeIssue = null;
+    if (rows.length === 0) {
+      alert('Please select focus areas');
+      return;
+    }
+
+    const payload: SaveFocusAreasPayload = {
+      focusAreas: rows,
+      grantID: String(this.grantId),
+      issueID: rows[0].issueIndex,
+      userEmail: 'ritu@fundsforngos.org',
+      userIndex: 5,
+    };
+
+    console.log('FINAL SAVE PAYLOAD:', payload);
+
+    this.api.saveFocusAreas(payload).subscribe({
+      next: (res) => {
+        console.log('Save Success:', res);
+        this.activeIssue = null;
+      },
+
+      error: (err) => {
+        console.error('Save Error:', err);
+        alert('Failed to save focus areas');
+      },
+    });
   }
 
   get selectedEntries() {
@@ -200,8 +281,17 @@ export class FocusAreaComponent implements OnInit {
   }
 
   getSubIssueName(issueId: number, subId: number): string {
-    const issue = this.issues.find((i: Issue) => i.id === issueId);
-    return issue?.subIssues.find((s: SubIssue) => s.id === subId)?.name || '';
+    // if loaded
+    const issue = this.issues.find((i) => i.id === issueId);
+
+    const loadedName = issue?.subIssues.find((s) => s.id === subId)?.name;
+
+    if (loadedName) return loadedName;
+
+    // fallback selected api
+    const savedName = this.selectedNames.get(issueId)?.find((x) => x.id === subId)?.name;
+
+    return savedName || '';
   }
 
   private isTextMatching(text: string, subName: string): boolean {

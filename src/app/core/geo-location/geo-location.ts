@@ -6,7 +6,15 @@ import { IDropdownSettings, NgMultiSelectDropDownModule } from 'ng-multiselect-d
 import { Api } from '../Services/api';
 import {
   DropdownItem,
+  SaveCitiesPayload,
+  SaveCityPayload,
+  SaveInsularPayload,
+  SaveStatesPayload,
+  SaveTownshipPayload,
 } from '../../datatype';
+import { Input } from '@angular/core';
+import { forkJoin } from 'rxjs';
+import { ApiSuccessResponse } from '../../datatype';
 
 type GeoKey = 'cities' | 'township' | 'insular' | 'states';
 
@@ -18,6 +26,7 @@ type GeoKey = 'cities' | 'township' | 'insular' | 'states';
   styleUrl: './geo-location.scss',
 })
 export class GeoLocationComponent implements OnInit {
+  @Input() grantId?: number;
   showPasteModal = false;
   pasteText = '';
 
@@ -93,10 +102,14 @@ export class GeoLocationComponent implements OnInit {
   geoKeys: GeoKey[] = [];
 
   ngOnInit(): void {
-    this.loadGeoData();
+    this.loadGeoData(() => {
+      if (this.grantId) {
+        this.loadSelectedGeoData(this.grantId);
+      }
+    });
+
     this.geoKeys = Object.keys(this.geoDropdowns) as GeoKey[];
   }
-
   loadGeoData(callback?: () => void) {
     let completed = 0;
 
@@ -145,38 +158,67 @@ export class GeoLocationComponent implements OnInit {
   }
 
   loadSelectedGeoData(grantId: number) {
+    console.log('Grant ID:', grantId);
+
     // Cities
-    this.api.getSelectedCities(grantId).subscribe((res) => {
-      this.geoDropdowns.cities.selected = res.cities.map((c) => ({
-        item_id: c.cityIndex,
-        item_text: c.cityName.trim(),
-      }));
+    this.api.getSelectedCities(grantId).subscribe({
+      next: (res: any) => {
+        console.log('Cities Response:', res);
+
+        this.geoDropdowns.cities.selected =
+          res.tempUSGrantCities?.map((c: any) => ({
+            item_id: c.cityIndex,
+            item_text: c.cityName.trim(),
+          })) || [];
+
+        console.log('Cities Selected:', this.geoDropdowns.cities.selected);
+      },
+      error: (err) => console.error('Cities Error:', err),
     });
 
     // States
-    this.api.getSelectedStates(grantId).subscribe((res) => {
-      this.geoDropdowns.states.selected = res.states.map((s) => ({
-        item_id: s.stateIndex,
-        item_text: s.stateName.trim(),
-      }));
+    this.api.getSelectedStates(grantId).subscribe({
+      next: (res: any) => {
+        console.log('States Response:', res);
+
+        this.geoDropdowns.states.selected =
+          res.tempUSGrantStates?.map((s: any) => ({
+            item_id: s.stateIndex,
+            item_text: s.stateName.trim(),
+          })) || [];
+
+        console.log('States Selected:', this.geoDropdowns.states.selected);
+      },
+      error: (err) => console.error('States Error:', err),
     });
 
     // Township
-    this.api.getSelectedTownships(grantId).subscribe((res) => {
-      this.geoDropdowns.township.selected = res.townships.map((t) => ({
-        item_id: t.townshipIndex,
-        item_text: t.townshipName.trim(),
-      }));
+    this.api.getSelectedTownships(grantId).subscribe({
+      next: (res: any) => {
+        console.log('Township Response:', res);
+
+        this.geoDropdowns.township.selected =
+          res.tempData?.map((t: any) => ({
+            item_id: t.townshipIndex,
+            item_text: t.townshipName.trim(),
+          })) || [];
+      },
     });
 
     // Insular
-    this.api.getSelectedInsular(grantId).subscribe((res) => {
-      this.geoDropdowns.insular.selected = res.insularAreas.map((i) => ({
-        item_id: i.areaIndex,
-        item_text: i.areaName.trim(),
-      }));
+    this.api.getSelectedInsular(grantId).subscribe({
+      next: (res: any) => {
+        console.log('Insular Response:', res);
+
+        this.geoDropdowns.insular.selected =
+          res.tempData?.map((i: any) => ({
+            item_id: i.areaIndex,
+            item_text: i.areaName.trim(),
+          })) || [];
+      },
     });
   }
+
   goToFocusAreas() {
     this.router.navigate(['/focus-areas']);
   }
@@ -210,7 +252,6 @@ export class GeoLocationComponent implements OnInit {
     );
 
     if (exists) {
-      alert(`${trimmedName} already exists!`);
       return;
     }
 
@@ -250,7 +291,6 @@ export class GeoLocationComponent implements OnInit {
   }
   generateFromText() {
     if (!this.pasteText.trim()) {
-      alert('Please paste some text');
       return;
     }
     const text = this.pasteText.toLowerCase();
@@ -264,13 +304,71 @@ export class GeoLocationComponent implements OnInit {
     });
   }
 
-  saveAll() {
-    const result: Record<string, string[]> = {};
-    (Object.keys(this.geoDropdowns) as GeoKey[]).forEach((key) => {
-      const selected = this.geoDropdowns[key].selected;
-      if (selected.length > 0) {
-        result[key] = selected.map((item: DropdownItem) => item.item_text);
-      }
+  saveAll(): void {
+    if (!this.grantId) {
+      return;
+    }
+
+    const grantId = this.grantId;
+
+    // Cities
+    const citiesPayload: SaveCitiesPayload = {
+      grantIndex: String(grantId),
+      grantCities: this.geoDropdowns.cities.selected.map((item) => ({
+        cityIndex: item.item_id,
+        cityName: item.item_text,
+      })),
+    };
+    // Insular
+    const insularPayload: SaveInsularPayload = {
+      grantIndex: grantId,
+      grantInsularAreas: this.geoDropdowns.insular.selected.map((item) => ({
+        areaIndex: item.item_id,
+        areaName: item.item_text,
+      })),
+    };
+
+    // Township
+    const townshipPayload: SaveTownshipPayload = {
+      grantIndex: grantId,
+      grantTownships: this.geoDropdowns.township.selected.map((item) => ({
+        townshipIndex: item.item_id,
+        townshipName: item.item_text,
+      })),
+    };
+
+    // States
+    const statesPayload: SaveStatesPayload = {
+      grantIndex: grantId,
+      usGrantStates: this.geoDropdowns.states.selected.map((item) => ({
+        countryIndex: 230,
+        grantIndex: grantId,
+        recordIndex: 0,
+        stateIndex: item.item_id,
+        stateName: item.item_text,
+      })),
+      userEmail: 'ritu@fundsforngos.org',
+      userIndex: 5,
+    };
+
+    console.log('Cities Payload:', citiesPayload);
+    console.log('Insular Payload:', insularPayload);
+    console.log('Township Payload:', townshipPayload);
+    console.log('States Payload:', statesPayload);
+
+    forkJoin({
+      cities: this.api.insertGrantCities(citiesPayload),
+      insular: this.api.insertGrantInsular(insularPayload),
+      township: this.api.insertGrantTownships(townshipPayload),
+      states: this.api.insertGrantStates(statesPayload),
+    }).subscribe({
+      next: (response) => {
+        console.log('All Saved:', response);
+      },
+
+      error: (error) => {
+        console.error('Save Error:', error);
+      },
     });
   }
 }

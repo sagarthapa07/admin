@@ -163,21 +163,32 @@ export interface GetSubEntitiesResponse {
 // ================== SELECTED GEO ==================
 
 export interface SelectedCity {
+  recordIndex: number;
+  grantIndex: number;
   cityIndex: number;
   cityName: string;
 }
 
 export interface GetSelectedCitiesResponse {
-  cities: SelectedCity[];
+  status: number;
+  successCode: number;
+  message: string;
+  tempUSGrantCities: SelectedCity[];
 }
 
 export interface SelectedState {
+  recordIndex: number;
+  grantIndex: number;
   stateIndex: number;
   stateName: string;
+  countryIndex: number;
 }
 
 export interface GetSelectedStatesResponse {
-  states: SelectedState[];
+  status: number;
+  successCode: number;
+  message: string;
+  tempUSGrantStates: SelectedState[];
 }
 
 export interface SelectedTownship {
@@ -186,7 +197,10 @@ export interface SelectedTownship {
 }
 
 export interface GetSelectedTownshipsResponse {
-  townships: SelectedTownship[];
+  status: number;
+  successCode: number;
+  message: string;
+  tempUSGrantTownships: SelectedTownship[];
 }
 
 export interface SelectedInsular {
@@ -195,10 +209,105 @@ export interface SelectedInsular {
 }
 
 export interface GetSelectedInsularResponse {
-  insularAreas: SelectedInsular[];
+  status: number;
+  successCode: number;
+  message: string;
+  tempUSGrantInsularAreas: SelectedInsular[];
 }
+
 export interface GeoDropdown {
   label: string;
   data: DropdownItem[];
   selected: DropdownItem[];
+}
+
+// ================= SAVE RESPONSE =================
+
+export interface ApiSuccessResponse {
+  status: number;
+  successCode: number;
+  message: string;
+}
+
+// ================= SAVE PAYLOADS =================
+
+export interface SaveCityPayload {
+  cityIndex: number;
+  cityName: string;
+}
+
+export interface SaveInsularPayload {
+  grantIndex: number;
+  grantInsularAreas: {
+    areaIndex: number;
+    areaName: string;
+  }[];
+}
+
+export interface SaveTownshipPayload {
+  grantIndex: number;
+  grantTownships: {
+    townshipIndex: number;
+    townshipName: string;
+  }[];
+}
+
+export interface SaveStateItem {
+  countryIndex: number;
+  grantIndex: number;
+  recordIndex: number;
+  stateIndex: number;
+  stateName: string;
+}
+
+export interface SaveStatesPayload {
+  grantIndex: number;
+  usGrantStates: SaveStateItem[];
+  userEmail: string;
+  userIndex: number;
+}
+
+export interface SaveGrantCityItem {
+  cityIndex: number;
+  cityName: string;
+}
+
+export interface SaveCitiesPayload {
+  grantIndex: string;
+  grantCities: SaveGrantCityItem[];
+}
+
+
+export interface SelectedFocusArea {
+  grantIndex: number;
+  issueIndex: number;
+  subIssueIndex: number;
+  issueName: string;
+  subIssueName: string;
+}
+
+export interface GetSelectedFocusAreasResponse {
+  status: number;
+  successCode: number;
+  message: string;
+  tempUSGrantFocusAreas: SelectedFocusArea[];
+}
+
+export interface SaveFocusAreaRow {
+  grantIndex: number;
+  subIssueIndex: number;
+  subIssueName: string;
+  issueIndex: number;
+  issueName: string;
+  userIndex: number | null;
+  userEmail: string | null;
+}
+
+
+export interface SaveFocusAreasPayload {
+  focusAreas: SaveFocusAreaRow[];
+  grantID: string;
+  issueID: number;
+  userEmail: string;
+  userIndex: number;
 }

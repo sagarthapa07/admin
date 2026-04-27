@@ -17,6 +17,14 @@ import {
   GetSubEntitiesResponse,
   GetTownshipResponse,
   GrantApiResponse,
+  SaveCityPayload,
+  SaveInsularPayload,
+  SaveTownshipPayload,
+  SaveStatesPayload,
+  ApiSuccessResponse,
+  SaveCitiesPayload,
+  GetSelectedFocusAreasResponse,
+  SaveFocusAreasPayload,
 } from '../../datatype';
 
 @Injectable({
@@ -103,6 +111,34 @@ export class Api {
     );
   }
 
+  insertGrantCities(payload: SaveCitiesPayload) {
+    return this.http.post<ApiSuccessResponse>(
+      'https://ang-dnd.fundsforngospremium.com/api/USGrantCities/InsertUSGrantCitiesJSON',
+      payload,
+    );
+  }
+
+  insertGrantInsular(payload: SaveInsularPayload) {
+    return this.http.post<ApiSuccessResponse>(
+      'https://ang-dnd.fundsforngospremium.com/api/USGrantInsularAreas/InsertUSGrantInsularAreasJSON',
+      payload,
+    );
+  }
+
+  insertGrantTownships(payload: SaveTownshipPayload) {
+    return this.http.post<ApiSuccessResponse>(
+      'https://ang-dnd.fundsforngospremium.com/api/USGrantTownships/InsertUSGrantTownshipsJSON',
+      payload,
+    );
+  }
+
+  insertGrantStates(payload: SaveStatesPayload) {
+    return this.http.post<ApiSuccessResponse>(
+      'https://ang-dnd.fundsforngospremium.com/api/USGrantStates/InsertUSGrantGeoStates',
+      payload,
+    );
+  }
+
   //Focus AReas k liye APis USe hori h yha se
   getFocusAreas(): Observable<GetFocusAreasResponse> {
     return this.http.get<GetFocusAreasResponse>(
@@ -115,6 +151,18 @@ export class Api {
     );
   }
 
+  getSelectedFocusAreas(grantId: number): Observable<GetSelectedFocusAreasResponse> {
+    return this.http.get<GetSelectedFocusAreasResponse>(
+      `https://ang-dnd.fundsforngospremium.com/api/USGrantFocusAreas/GetUSGrantFocusAreasAll?GrantID=${grantId}`,
+    );
+  }
+
+  saveFocusAreas(payload: SaveFocusAreasPayload) {
+    return this.http.post<ApiSuccessResponse>(
+      'https://ang-dnd.fundsforngospremium.com/api/USGrantFocusAreas/InsertUSGrantFocusAreas',
+      payload,
+    );
+  }
   // Focus Group k liyeee APis used
 
   getBeneficiaries(): Observable<GetBeneficiariesResponse> {
