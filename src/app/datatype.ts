@@ -150,12 +150,6 @@ export interface GetEntitiesResponse {
   usEntities: Entity[];
 }
 
-// ================== SUB ENTITY ==================
-export interface SubEntity {
-  subEntId: number;
-  subEntName: string;
-}
-
 export interface GetSubEntitiesResponse {
   subEntities: SubEntity[];
 }
@@ -277,7 +271,6 @@ export interface SaveCitiesPayload {
   grantCities: SaveGrantCityItem[];
 }
 
-
 export interface SelectedFocusArea {
   grantIndex: number;
   issueIndex: number;
@@ -303,11 +296,56 @@ export interface SaveFocusAreaRow {
   userEmail: string | null;
 }
 
-
 export interface SaveFocusAreasPayload {
   focusAreas: SaveFocusAreaRow[];
   grantID: string;
   issueID: number;
   userEmail: string;
   userIndex: number;
+}
+
+export interface SubEntity {
+  subEntIndex: number;
+  subEntName: string;
+  entIndex: number;
+  entitiyName: string;
+}
+
+export interface SelectedSubEntity {
+  entityName: string;
+  subEntName: string;
+}
+
+export interface GetSelectedSubEntitiesResponse {
+  tempUSGrantSubEnt: SelectedSubEntity[];
+}
+
+export interface SelectedBeneficiary {
+  beneficiaryName: string;
+}
+
+export interface GetSelectedBeneficiariesResponse {
+  tempUSGrantBeneficiaries: SelectedBeneficiary[];
+}
+
+export interface InsertSubEntityRow {
+  entIndex: number;
+  entitiyName: string;
+  subEntIndex: number;
+  subEntName: string;
+}
+
+export interface InsertSubEntitiesPayload {
+  grantIndex: string;
+  grantSubEntities: InsertSubEntityRow[];
+}
+
+export interface InsertBeneficiaryRow {
+  beneficiaryIndex: number;
+  beneficiaryName: string;
+}
+
+export interface InsertBeneficiariesPayload {
+  grantIndex: string;
+  grantBeneficiaries: InsertBeneficiaryRow[];
 }

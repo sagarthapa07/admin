@@ -1,6 +1,6 @@
-import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { HttpClient } from "@angular/common/http";
+import { Injectable } from "@angular/core";
+import { Observable } from "rxjs";
 import {
   GetBeneficiariesResponse,
   GetCitiesResponse,
@@ -25,10 +25,14 @@ import {
   SaveCitiesPayload,
   GetSelectedFocusAreasResponse,
   SaveFocusAreasPayload,
-} from '../../datatype';
+  InsertSubEntitiesPayload,
+  InsertBeneficiariesPayload,
+  GetSelectedSubEntitiesResponse,
+  GetSelectedBeneficiariesResponse,
+} from "../../datatype";
 
 @Injectable({
-  providedIn: 'root',
+  providedIn: "root",
 })
 export class Api {
   constructor(private http: HttpClient) {}
@@ -36,20 +40,20 @@ export class Api {
   // Grant Grid Api
   getGrants(payload: any): Observable<any> {
     return this.http.post<any>(
-      'https://ang-dnd.fundsforngospremium.com/api/USGrants/GetUSGrantsGridPaging',
-      payload,
+      "https://ang-dnd.fundsforngospremium.com/api/USGrants/GetUSGrantsGridPaging",
+      payload
     );
   }
   getGrantById(id: number): Observable<GrantApiResponse> {
     return this.http.get<GrantApiResponse>(
-      `https://ang-dnd.fundsforngospremium.com/api/USGrants/GetUSGrantsDetail?id=${id}`,
+      `https://ang-dnd.fundsforngospremium.com/api/USGrants/GetUSGrantsDetail?id=${id}`
     );
   }
 
   updateGrant(id: number, payload: any) {
     return this.http.post(
       `https://ang-dnd.fundsforngospremium.com/api/USGrants/UpdateUSGrants?id=${id}`,
-      payload,
+      payload
     );
   }
 
@@ -57,7 +61,7 @@ export class Api {
 
   searchDonors(donorType: string, searchText: string): Observable<any> {
     return this.http.get<any>(
-      `https://adminapi.grantsforus.app/api/USDonors/GetUSDonorsByType?donorType=${donorType}&searchText=${searchText}`,
+      `https://adminapi.grantsforus.app/api/USDonors/GetUSDonorsByType?donorType=${donorType}&searchText=${searchText}`
     );
   }
 
@@ -65,122 +69,156 @@ export class Api {
 
   getTownShips(): Observable<GetTownshipResponse> {
     return this.http.get<GetTownshipResponse>(
-      'https://ang-dnd.fundsforngospremium.com/api/TownShips/GetTownShips',
+      "https://ang-dnd.fundsforngospremium.com/api/TownShips/GetTownShips"
     );
   }
 
   getInsularAreas(): Observable<GetInsularResponse> {
     return this.http.get<GetInsularResponse>(
-      'https://ang-dnd.fundsforngospremium.com/api/InsularAreas/GetInsularAreas',
+      "https://ang-dnd.fundsforngospremium.com/api/InsularAreas/GetInsularAreas"
     );
   }
 
   getCities(): Observable<GetCitiesResponse> {
     return this.http.get<GetCitiesResponse>(
-      'https://ang-dnd.fundsforngospremium.com/api/Cities/GetCities',
+      "https://ang-dnd.fundsforngospremium.com/api/Cities/GetCities"
     );
   }
 
   getStates(): Observable<GetStatesResponse> {
     return this.http.get<GetStatesResponse>(
-      'https://ang-dnd.fundsforngospremium.com/api/States/GetUSStates',
+      "https://ang-dnd.fundsforngospremium.com/api/States/GetUSStates"
     );
   }
 
   getSelectedCities(grantId: number): Observable<GetSelectedCitiesResponse> {
     return this.http.get<GetSelectedCitiesResponse>(
-      `https://ang-dnd.fundsforngospremium.com/api/USGrantCities/ListCitiesForSelectedGrant?GrantID=${grantId}`,
+      `https://ang-dnd.fundsforngospremium.com/api/USGrantCities/ListCitiesForSelectedGrant?GrantID=${grantId}`
     );
   }
 
   getSelectedStates(grantId: number): Observable<GetSelectedStatesResponse> {
     return this.http.get<GetSelectedStatesResponse>(
-      `https://ang-dnd.fundsforngospremium.com/api/USGrantStates/ListGeoStatesForSelectedGrant?GrantID=${grantId}`,
+      `https://ang-dnd.fundsforngospremium.com/api/USGrantStates/ListGeoStatesForSelectedGrant?GrantID=${grantId}`
     );
   }
 
-  getSelectedTownships(grantId: number): Observable<GetSelectedTownshipsResponse> {
+  getSelectedTownships(
+    grantId: number
+  ): Observable<GetSelectedTownshipsResponse> {
     return this.http.get<GetSelectedTownshipsResponse>(
-      `https://ang-dnd.fundsforngospremium.com/api/USGrantTownships/ListTownshipsForSelectedGrant?GrantID=${grantId}`,
+      `https://ang-dnd.fundsforngospremium.com/api/USGrantTownships/ListTownshipsForSelectedGrant?GrantID=${grantId}`
     );
   }
 
   getSelectedInsular(grantId: number): Observable<GetSelectedInsularResponse> {
     return this.http.get<GetSelectedInsularResponse>(
-      `https://ang-dnd.fundsforngospremium.com/api/USGrantInsularAreas/ListInsularAreasForSelectedGrant?GrantID=${grantId}`,
+      `https://ang-dnd.fundsforngospremium.com/api/USGrantInsularAreas/ListInsularAreasForSelectedGrant?GrantID=${grantId}`
     );
   }
 
   insertGrantCities(payload: SaveCitiesPayload) {
     return this.http.post<ApiSuccessResponse>(
-      'https://ang-dnd.fundsforngospremium.com/api/USGrantCities/InsertUSGrantCitiesJSON',
-      payload,
+      "https://ang-dnd.fundsforngospremium.com/api/USGrantCities/InsertUSGrantCitiesJSON",
+      payload
     );
   }
 
   insertGrantInsular(payload: SaveInsularPayload) {
     return this.http.post<ApiSuccessResponse>(
-      'https://ang-dnd.fundsforngospremium.com/api/USGrantInsularAreas/InsertUSGrantInsularAreasJSON',
-      payload,
+      "https://ang-dnd.fundsforngospremium.com/api/USGrantInsularAreas/InsertUSGrantInsularAreasJSON",
+      payload
     );
   }
 
   insertGrantTownships(payload: SaveTownshipPayload) {
     return this.http.post<ApiSuccessResponse>(
-      'https://ang-dnd.fundsforngospremium.com/api/USGrantTownships/InsertUSGrantTownshipsJSON',
-      payload,
+      "https://ang-dnd.fundsforngospremium.com/api/USGrantTownships/InsertUSGrantTownshipsJSON",
+      payload
     );
   }
 
   insertGrantStates(payload: SaveStatesPayload) {
     return this.http.post<ApiSuccessResponse>(
-      'https://ang-dnd.fundsforngospremium.com/api/USGrantStates/InsertUSGrantGeoStates',
-      payload,
+      "https://ang-dnd.fundsforngospremium.com/api/USGrantStates/InsertUSGrantGeoStates",
+      payload
     );
   }
 
   //Focus AReas k liye APis USe hori h yha se
   getFocusAreas(): Observable<GetFocusAreasResponse> {
     return this.http.get<GetFocusAreasResponse>(
-      'https://ang-dnd.fundsforngospremium.com/api/FocusAreas/GetUSFocusAreas',
+      "https://ang-dnd.fundsforngospremium.com/api/FocusAreas/GetUSFocusAreas"
     );
   }
   getFocusSubAreas(issueId: number): Observable<GetFocusSubAreasResponse> {
     return this.http.get<GetFocusSubAreasResponse>(
-      `https://ang-dnd.fundsforngospremium.com/api/FocusSubAreas/GetUSFocusSubAreasForArea?IssueId=${issueId}`,
+      `https://ang-dnd.fundsforngospremium.com/api/FocusSubAreas/GetUSFocusSubAreasForArea?IssueId=${issueId}`
     );
   }
 
-  getSelectedFocusAreas(grantId: number): Observable<GetSelectedFocusAreasResponse> {
+  getSelectedFocusAreas(
+    grantId: number
+  ): Observable<GetSelectedFocusAreasResponse> {
     return this.http.get<GetSelectedFocusAreasResponse>(
-      `https://ang-dnd.fundsforngospremium.com/api/USGrantFocusAreas/GetUSGrantFocusAreasAll?GrantID=${grantId}`,
+      `https://ang-dnd.fundsforngospremium.com/api/USGrantFocusAreas/GetUSGrantFocusAreasAll?GrantID=${grantId}`
     );
   }
 
   saveFocusAreas(payload: SaveFocusAreasPayload) {
     return this.http.post<ApiSuccessResponse>(
-      'https://ang-dnd.fundsforngospremium.com/api/USGrantFocusAreas/InsertUSGrantFocusAreas',
-      payload,
+      "https://ang-dnd.fundsforngospremium.com/api/USGrantFocusAreas/InsertUSGrantFocusAreas",
+      payload
     );
   }
   // Focus Group k liyeee APis used
 
   getBeneficiaries(): Observable<GetBeneficiariesResponse> {
     return this.http.get<GetBeneficiariesResponse>(
-      'https://ang-dnd.fundsforngospremium.com/api/Beneficiaries/GetBeneficiaries',
+      "https://ang-dnd.fundsforngospremium.com/api/Beneficiaries/GetBeneficiaries"
+    );
+  }
+
+  getSelectedFocusGroups(
+    grantId: number
+  ): Observable<GetSelectedSubEntitiesResponse> {
+    return this.http.get<GetSelectedSubEntitiesResponse>(
+      `https://ang-dnd.fundsforngospremium.com/api/USGrantSubEntities/LisSubEntitiesForSelectedGrant?GrantID=${grantId}`
+    );
+  }
+
+  getSelectedBeneficiaries(
+    grantId: number
+  ): Observable<GetSelectedBeneficiariesResponse> {
+    return this.http.get<GetSelectedBeneficiariesResponse>(
+      `https://ang-dnd.fundsforngospremium.com/api/USGrantBeneficiaries/ListBeneficiariesForSelectedGrant?GrantID=${grantId}`
+    );
+  }
+
+  insertSubEntities(payload: InsertSubEntitiesPayload) {
+    return this.http.post<ApiSuccessResponse>(
+      "https://ang-dnd.fundsforngospremium.com/api/USGrantSubEntities/InsertUSGrantSubEntitiesJSON",
+      payload
+    );
+  }
+
+  insertBeneficiaries(payload: InsertBeneficiariesPayload) {
+    return this.http.post<ApiSuccessResponse>(
+      "https://ang-dnd.fundsforngospremium.com/api/USGrantBeneficiaries/InsertUSGrantBeneficiariesJSON",
+      payload
     );
   }
 
   // Entities API
   getEntities(): Observable<GetEntitiesResponse> {
     return this.http.get<GetEntitiesResponse>(
-      'https://ang-dnd.fundsforngospremium.com/api/Entities/GetEntities',
+      "https://ang-dnd.fundsforngospremium.com/api/Entities/GetEntities"
     );
   }
 
   getSubEntities(entId: number): Observable<GetSubEntitiesResponse> {
     return this.http.get<GetSubEntitiesResponse>(
-      `https://ang-dnd.fundsforngospremium.com/api/SubEntities/GetSubEntitiesForEntity?EntId=${entId}`,
+      `https://ang-dnd.fundsforngospremium.com/api/SubEntities/GetSubEntitiesForEntity?EntId=${entId}`
     );
   }
 
@@ -188,14 +226,14 @@ export class Api {
   //   ye hai State k Data ko get krnae k liye jo dropdown mai use hoga
   getAllStates(): Observable<GetStatesResponse> {
     return this.http.get<GetStatesResponse>(
-      'https://ang-dnd.fundsforngospremium.com/api/States/GetAllStates',
+      "https://ang-dnd.fundsforngospremium.com/api/States/GetAllStates"
     );
   }
 
   // ye hai kisi state ki county ko get krne k liye
   getCountiesByState(stateId: number): Observable<GetCountiesResponse> {
     return this.http.get<GetCountiesResponse>(
-      `https://ang-dnd.fundsforngospremium.com/api/GEOCounties/GetGEOCountiesForStates?StateID=${stateId}`,
+      `https://ang-dnd.fundsforngospremium.com/api/GEOCounties/GetGEOCountiesForStates?StateID=${stateId}`
     );
   }
 }

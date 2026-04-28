@@ -1,23 +1,21 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from "@angular/core/testing";
+import { FocusGroupsComponent } from "./focus-groups";
 
-import { FocusGroups } from './focus-groups';
-
-describe('FocusGroups', () => {
-  let component: FocusGroups;
-  let fixture: ComponentFixture<FocusGroups>;
+describe("FocusGroupsComponent", () => {
+  let component: FocusGroupsComponent;
+  let fixture: ComponentFixture<FocusGroupsComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [FocusGroups]
-    })
-    .compileComponents();
+      imports: [FocusGroupsComponent],
+    }).compileComponents();
 
-    fixture = TestBed.createComponent(FocusGroups);
+    fixture = TestBed.createComponent(FocusGroupsComponent);
     component = fixture.componentInstance;
-    await fixture.whenStable();
+    fixture.detectChanges();
   });
 
-  it('should create', () => {
+  it("should create", () => {
     expect(component).toBeTruthy();
   });
 });

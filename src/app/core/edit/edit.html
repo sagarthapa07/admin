@@ -28,8 +28,8 @@
     <app-focus-area [grantId]="grantData.id"></app-focus-area>
   </div>
 
-  <div *ngIf="activeItem === 'Focus Groups'">
-    <app-focus-groups></app-focus-groups>
+  <div *ngIf="activeItem === 'Focus Groups' && grantData">
+    <app-focus-groups [grantId]="grantData.id"></app-focus-groups>
   </div>
 
   <div *ngIf="activeItem === 'Counties'">

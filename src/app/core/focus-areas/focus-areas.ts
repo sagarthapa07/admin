@@ -1,29 +1,31 @@
-import { Component, OnInit, HostListener, ElementRef, ViewChild } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
-import { ISSUES, Issue, SubIssue } from '../edit/issues.data';
-import { Api } from '../Services/api';
-import { lastValueFrom } from 'rxjs';
 import {
-  FocusArea,
+  Component,
+  OnInit,
+  HostListener,
+  ElementRef,
+  ViewChild,
+} from "@angular/core";
+import { CommonModule } from "@angular/common";
+import { FormsModule } from "@angular/forms";
+import { Router } from "@angular/router";
+import { Issue, SubIssue } from "../edit/issues.data";
+import { Api } from "../Services/api";
+import { lastValueFrom } from "rxjs";
+import {
   FocusSubArea,
-  GetFocusAreasResponse,
   GetFocusSubAreasResponse,
-  SaveFocusAreaRow,
-  SaveFocusAreasPayload,
-} from '../../datatype';
-import { Input } from '@angular/core';
+} from "../../datatype";
+import { Input } from "@angular/core";
 
 @Component({
-  selector: 'app-focus-area',
+  selector: "app-focus-area",
   standalone: true,
   imports: [CommonModule, FormsModule],
-  templateUrl: './focus-areas.html',
-  styleUrl: './focus-areas.scss',
+  templateUrl: "./focus-areas.html",
+  styleUrl: "./focus-areas.scss",
 })
 export class FocusAreaComponent implements OnInit {
-  @ViewChild('issueContainer') issueContainer!: ElementRef;
+  @ViewChild("issueContainer") issueContainer!: ElementRef;
   @Input() grantId?: number;
 
   issues: Issue[] = [];
@@ -31,23 +33,24 @@ export class FocusAreaComponent implements OnInit {
   hoverTimer: number | undefined;
   selectedMap = new Map<number, number[]>();
   showPasteModal = false;
-  pasteText = '';
+  pasteText = "";
   selectedNames = new Map<number, { id: number; name: string }[]>();
+  showToast = false;
+  toastMessage = "";
 
-  constructor(
-    private router: Router,
-    private api: Api,
-  ) {}
+  constructor(private router: Router, private api: Api) {}
 
   ngOnInit(): void {
     this.loadFocusAreas();
   }
 
-  @HostListener('document:click', ['$event'])
+  @HostListener("document:click", ["$event"])
   handleOutsideClick(event: MouseEvent) {
     if (!this.issueContainer) return;
 
-    const clickedInside = this.issueContainer.nativeElement.contains(event.target);
+    const clickedInside = this.issueContainer.nativeElement.contains(
+      event.target
+    );
 
     if (!clickedInside) {
       this.activeIssue = null;
@@ -104,6 +107,15 @@ export class FocusAreaComponent implements OnInit {
     });
   }
 
+  showSuccessMessage(msg: string) {
+    this.toastMessage = msg;
+    this.showToast = true;
+
+    setTimeout(() => {
+      this.showToast = false;
+    }, 3000);
+  }
+
   onLeaveIssue() {
     if (this.hoverTimer !== undefined) {
       clearTimeout(this.hoverTimer);
@@ -142,19 +154,22 @@ export class FocusAreaComponent implements OnInit {
   changedMap = new Map<number, number[]>();
   toggleSub(issue: Issue, sub: SubIssue) {
     const selected = this.selectedMap.get(issue.id) || [];
-    const changed = this.changedMap.get(issue.id) || [];
+    let changed = this.changedMap.get(issue.id) || [];
 
     if (selected.includes(sub.id)) {
-      const updated = selected.filter((id) => id !== sub.id);
-      this.selectedMap.set(issue.id, updated);
+      this.selectedMap.set(
+        issue.id,
+        selected.filter((id) => id !== sub.id)
+      );
     } else {
       this.selectedMap.set(issue.id, [...selected, sub.id]);
     }
 
-    // changed map me save karo
     if (!changed.includes(sub.id)) {
-      this.changedMap.set(issue.id, [...changed, sub.id]);
+      changed.push(sub.id);
     }
+
+    this.changedMap.set(issue.id, changed);
   }
 
   isSubSelected(issue: Issue, sub: SubIssue): boolean {
@@ -172,31 +187,33 @@ export class FocusAreaComponent implements OnInit {
   }
 
   isAllSelected(issue: Issue): boolean {
-    return (this.selectedMap.get(issue.id)?.length || 0) === issue.subIssues.length;
+    return (
+      (this.selectedMap.get(issue.id)?.length || 0) === issue.subIssues.length
+    );
   }
 
   clearIssue(issueId: number) {
     this.selectedMap.delete(issueId);
+    this.changedMap.delete(issueId);
 
     if (this.activeIssue?.id === issueId) {
       this.activeIssue = null;
     }
+
+    this.removeIssueFromApi(issueId);
   }
+
   hasAnySelected(issue: Issue): boolean {
     return (this.selectedMap.get(issue.id)?.length || 0) > 0;
   }
 
-  saveSelectedIssues(): void {
-    if (!this.grantId) {
-      alert('Grant ID missing');
-      return;
-    }
-    const rows: SaveFocusAreaRow[] = [];
+  saveSelectedIssues() {
+    const rows: any = [];
 
     this.changedMap.forEach((subIds, issueId) => {
       subIds.forEach((subId) => {
         rows.push({
-          grantIndex: this.grantId!,
+          grantIndex: this.grantId,
           subIssueIndex: subId,
           subIssueName: this.getSubIssueName(issueId, subId),
           issueIndex: issueId,
@@ -207,30 +224,20 @@ export class FocusAreaComponent implements OnInit {
       });
     });
 
-    if (rows.length === 0) {
-      alert('Please select focus areas');
-      return;
-    }
-
-    const payload: SaveFocusAreasPayload = {
+    const payload = {
       focusAreas: rows,
       grantID: String(this.grantId),
       issueID: rows[0].issueIndex,
-      userEmail: 'ritu@fundsforngos.org',
+      userEmail: "ritu@fundsforngos.org",
       userIndex: 5,
     };
 
-    console.log('FINAL SAVE PAYLOAD:', payload);
-
     this.api.saveFocusAreas(payload).subscribe({
-      next: (res) => {
-        console.log('Save Success:', res);
+      next: () => {
+        debugger
         this.activeIssue = null;
-      },
-
-      error: (err) => {
-        console.error('Save Error:', err);
-        alert('Failed to save focus areas');
+        this.changedMap.clear();
+        this.showSuccessMessage("Focus Areas Saved Successfully");
       },
     });
   }
@@ -238,13 +245,15 @@ export class FocusAreaComponent implements OnInit {
   get selectedEntries() {
     return Array.from(this.selectedMap.entries());
   }
-
   clearSingleSub(issueId: number, subId: number) {
     const selected = this.selectedMap.get(issueId) || [];
+
     const updated = selected.filter((id) => id !== subId);
 
     if (updated.length === 0) {
       this.selectedMap.delete(issueId);
+      this.changedMap.delete(issueId);
+      this.removeIssueFromApi(issueId);
     } else {
       this.selectedMap.set(issueId, updated);
     }
@@ -252,23 +261,33 @@ export class FocusAreaComponent implements OnInit {
 
   removeWholeIssue(issueId: number) {
     this.selectedMap.delete(issueId);
+    this.changedMap.delete(issueId);
+
+    this.removeIssueFromApi(issueId);
   }
 
   clearAll() {
+    const issueIds = Array.from(this.selectedMap.keys());
+
+    issueIds.forEach((issueId) => {
+      this.removeIssueFromApi(issueId);
+    });
+
     this.selectedMap.clear();
+    this.changedMap.clear();
     this.activeIssue = null;
   }
 
   goToGeoLocation() {
-    this.router.navigate(['/geo-location']);
+    this.router.navigate(["/geo-location"]);
   }
 
   goToFocusGroup() {
-    this.router.navigate(['/focus-group']);
+    this.router.navigate(["/focus-group"]);
   }
 
   openPasteModal() {
-    this.pasteText = '';
+    this.pasteText = "";
     this.showPasteModal = true;
   }
 
@@ -277,7 +296,7 @@ export class FocusAreaComponent implements OnInit {
   }
 
   getIssueName(issueId: number): string {
-    return this.issues.find((issue: Issue) => issue.id === issueId)?.name || '';
+    return this.issues.find((issue: Issue) => issue.id === issueId)?.name || "";
   }
 
   getSubIssueName(issueId: number, subId: number): string {
@@ -289,9 +308,11 @@ export class FocusAreaComponent implements OnInit {
     if (loadedName) return loadedName;
 
     // fallback selected api
-    const savedName = this.selectedNames.get(issueId)?.find((x) => x.id === subId)?.name;
+    const savedName = this.selectedNames
+      .get(issueId)
+      ?.find((x) => x.id === subId)?.name;
 
-    return savedName || '';
+    return savedName || "";
   }
 
   private isTextMatching(text: string, subName: string): boolean {
@@ -303,12 +324,12 @@ export class FocusAreaComponent implements OnInit {
     }
 
     // Partial word match
-    const words: string[] = normalizedSubName.split(' ');
+    const words: string[] = normalizedSubName.split(" ");
     return words.some((word: string) => text.includes(word));
   }
   async generateFromText(): Promise<void> {
     if (!this.pasteText.trim()) {
-      alert('Please paste some text');
+      alert("Please paste some text");
       return;
     }
 
@@ -320,7 +341,7 @@ export class FocusAreaComponent implements OnInit {
         // Load subIssues if not already loaded
         if (!issue.subIssues || issue.subIssues.length === 0) {
           const res: GetFocusSubAreasResponse = await lastValueFrom(
-            this.api.getFocusSubAreas(issue.id),
+            this.api.getFocusSubAreas(issue.id)
           );
 
           if (res.successCode === 1) {
@@ -331,12 +352,12 @@ export class FocusAreaComponent implements OnInit {
           }
         }
 
-        // 🔹 Find matching subIssues
+        // Find matching subIssues
         const matchedSubIds: number[] = issue.subIssues
           .filter((sub: SubIssue) => this.isTextMatching(text, sub.name))
           .map((sub: SubIssue) => sub.id);
 
-        // 🔹 Save matches
+        // Save matches
         if (matchedSubIds.length > 0) {
           this.selectedMap.set(issue.id, matchedSubIds);
         }
@@ -345,7 +366,28 @@ export class FocusAreaComponent implements OnInit {
       }
     }
 
-    console.log('AUTO DATA:', this.selectedMap);
+    console.log("AUTO DATA:", this.selectedMap);
     this.showPasteModal = false;
+  }
+
+  removeIssueFromApi(issueId: number) {
+    const payload = {
+      focusAreas: [],
+      grantID: String(this.grantId),
+      issueID: issueId,
+      userEmail: "ritu@fundsforngos.org",
+      userIndex: 5,
+    };
+
+    console.log("REMOVE PAYLOAD:", payload);
+
+    this.api.saveFocusAreas(payload).subscribe({
+      next: (res) => {
+        console.log("Removed Success", res);
+      },
+      error: (err) => {
+        console.log("Remove Error", err);
+      },
+    });
   }
 }
