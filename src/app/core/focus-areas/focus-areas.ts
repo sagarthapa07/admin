@@ -234,7 +234,6 @@ export class FocusAreaComponent implements OnInit {
 
     this.api.saveFocusAreas(payload).subscribe({
       next: () => {
-        debugger
         this.activeIssue = null;
         this.changedMap.clear();
         this.showSuccessMessage("Focus Areas Saved Successfully");
