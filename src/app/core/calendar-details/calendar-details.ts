@@ -12,10 +12,11 @@ import { Editor } from '../../shared/component/editor/editor';
 import { Api } from '../Services/api';
 import { Input } from '@angular/core';
 import { GrantDetail } from '../../datatype';
+import { ImageCroper } from '../../shared/component/image-croper/image-croper';
 @Component({
   standalone: true,
   selector: 'app-calendar-details',
-  imports: [CommonModule, ReactiveFormsModule, FormsModule, Editor],
+  imports: [CommonModule, ReactiveFormsModule, FormsModule, Editor, ImageCroper],
   templateUrl: './calendar-details.html',
   styleUrls: ['./calendar-details.scss'],
 })
@@ -35,6 +36,7 @@ export class CalendarDetails {
   donorList: any[] = [];
   showDropdown = false;
   opportunityForm: FormGroup;
+  previewUrl: string = '';
 
   @HostListener('document:mousedown', ['$event'])
   onClickOutside(event: MouseEvent) {
@@ -179,64 +181,87 @@ export class CalendarDetails {
     );
   }
 
+  // onSave() {
+  //   const form = this.opportunityForm.value;
+
+  //   const payload = {
+  //     userIndex: 5,
+  //     userEmail: 'ritu@fundsforngos.org',
+
+  //     grantData: {
+  //       grantIndex: this.data?.id,
+  //       grantTitle: form.title,
+  //       linkURL: form.linkUrl,
+  //       postDate: this.formatDateISO(form.postDate),
+  //       pdValue: this.getDateNumber(form.postDate),
+  //       deadLineDate: this.formatDateISO(form.deadlineDate),
+  //       ddValue: this.getDateNumber(form.deadlineDate),
+  //       shortIntro: form.shortInfo,
+  //       donorType: 'UD',
+  //       donorIndex: 0,
+  //       donorAgency: form.donorAgency,
+  //       grantType: form.grantType,
+  //       grantSize: form.grantSize,
+  //       grantLogoImage: this.opportunityForm.value.img,
+  //       onGoingGrants: form.isOngoing ? 1 : 0,
+  //       status: form.status || 'Draft',
+  //       grantContent: form.letterText,
+  //       grantDuration: form.grantDuration,
+  //       stCtType: '',
+  //       stateString: '',
+  //       countyString: '',
+  //       issueString: '',
+  //       entityString: '',
+  //       viewCount: 0,
+  //     },
+
+  //     urlData: {
+  //       urlIndex: 0,
+  //       refIndex: this.data?.id,
+  //       urlRecordType: 'UG',
+  //       friendlyURLText: form.friendlyURL,
+  //     },
+  //   };
+
+  //   this.api.updateGrant(this.data?.id!, payload).subscribe({
+  //     next: (res) => console.log('SUCCESS', res),
+  //     error: (err) => console.log('ERROR', err),
+  //   });
+  // }
+
   onSave() {
     const form = this.opportunityForm.value;
 
-    const payload = {
-      userIndex: 5,
-      userEmail: 'ritu@fundsforngos.org',
+    const formData = new FormData();
+    
+    formData.append('img', form.img);
+    formData.append('title', form.title);
+    formData.append('friendlyURL', form.friendlyURL);
+    formData.append('linkURL', form.linkUrl);
+    formData.append('postDate', form.postDate);
+    formData.append('deadlineDate', form.deadlineDate);
+    formData.append('isOngoing', form.isOngoing);
+    formData.append('shortInfo', form.shortInfo);
+    formData.append('donorType', form.donorType);
+    formData.append('donorAgency', form.donorAgency);
+    formData.append('grantType', form.grantType);
+    formData.append('grantDuration', form.grantDuration);
+    formData.append('grantSize', form.grantSize);
+    formData.append('status', form.status);
+    formData.append('letterText', form.letterText);
 
-      grantData: {
-        grantIndex: this.data?.id,
-
-        grantTitle: form.title,
-        linkURL: form.linkUrl,
-
-        postDate: this.formatDateISO(form.postDate),
-        pdValue: this.getDateNumber(form.postDate),
-
-        deadLineDate: this.formatDateISO(form.deadlineDate),
-        ddValue: this.getDateNumber(form.deadlineDate),
-
-        shortIntro: form.shortInfo,
-
-        donorType: 'UD',
-        donorIndex: 0,
-        donorAgency: form.donorAgency,
-
-        grantType: form.grantType,
-        grantSize: form.grantSize,
-
-        // 🔥🔥🔥 YAHI DALNA HAI
-        grantLogoImage: this.data?.img || 'default.jpg',
-
-        onGoingGrants: form.isOngoing ? 1 : 0,
-
-        status: form.status || 'Draft',
-
-        grantContent: form.letterText,
-
-        grantDuration: form.grantDuration,
-
-        stCtType: '',
-        stateString: '',
-        countyString: '',
-        issueString: '',
-        entityString: '',
-        viewCount: 0,
-      },
-
-      urlData: {
-        urlIndex: 0,
-        refIndex: this.data?.id,
-        urlRecordType: 'UG',
-        friendlyURLText: form.friendlyURL,
-      },
-    };
-
-    this.api.updateGrant(this.data?.id!, payload).subscribe({
+    this.api.updateGrant(this.data?.id!, formData).subscribe({
       next: (res) => console.log('SUCCESS', res),
       error: (err) => console.log('ERROR', err),
     });
+  }
+  onImageCropped(file: File) {
+    this.opportunityForm.patchValue({ img: file });
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      this.previewUrl = reader.result as string;
+    };
+    reader.readAsDataURL(file);
   }
 }
