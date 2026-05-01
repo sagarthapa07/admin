@@ -349,3 +349,7 @@ export interface InsertBeneficiariesPayload {
   grantIndex: string;
   grantBeneficiaries: InsertBeneficiaryRow[];
 }
+export interface FocusGroupState {
+  beneficiaries: string[];
+  entities: Record<string, string[]>;
+}

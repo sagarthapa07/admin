@@ -13,6 +13,7 @@ import { Api } from '../Services/api';
 import { Input } from '@angular/core';
 import { GrantDetail } from '../../datatype';
 import { ImageCroper } from '../../shared/component/image-croper/image-croper';
+
 @Component({
   standalone: true,
   selector: 'app-calendar-details',
@@ -233,7 +234,7 @@ export class CalendarDetails {
     const form = this.opportunityForm.value;
 
     const formData = new FormData();
-    
+
     formData.append('img', form.img);
     formData.append('title', form.title);
     formData.append('friendlyURL', form.friendlyURL);

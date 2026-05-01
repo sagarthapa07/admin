@@ -86,3 +86,11 @@
 
 /* Importing Bootstrap SCSS file. */
 @import 'bootstrap/scss/bootstrap';
+.ngx-pe-img {
+  display: block !important;
+}
+
+.ngx-pe-cropper-wrapper img {
+  display: block !important;
+  max-width: 100%;
+}

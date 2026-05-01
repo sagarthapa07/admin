@@ -178,12 +178,10 @@
           <!-- <input type="file" class="form-control" formControlName="img" /> -->
           <app-image-croper
             label="Upload Image"
-            [cropSize]="'600x600'"
-            [type]="'thumbnail'"
             (cropImage)="onImageCropped($event)"
           >
-        </app-image-croper>
-        <img *ngIf="previewUrl" [src]="previewUrl" width="150" />
+          </app-image-croper>
+          <img *ngIf="previewUrl" [src]="previewUrl" width="150" />
         </div>
 
         <div class="form-group">

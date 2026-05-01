@@ -5,7 +5,7 @@ import { NgbCalendar, NgbDate, NgbDatepicker } from '@ng-bootstrap/ng-bootstrap'
 
 @Component({
   selector: 'app-date-range-picker',
-  imports: [NgbDatepicker, FormsModule, JsonPipe],
+  imports: [NgbDatepicker, FormsModule],
   templateUrl: './date-range-picker.html',
   styleUrl: './date-range-picker.scss',
 })
@@ -15,7 +15,7 @@ export class DateRangePicker {
 
   hoveredDate: NgbDate | null = null;
   fromDate: NgbDate = this.calendar.getToday();
-  toDate: NgbDate | null = this.calendar.getNext(this.fromDate, 'd', 10);
+  toDate: NgbDate | null = this.calendar.getNext(this.fromDate, 'd', 10); 
 
   onDateSelection(date: NgbDate) {
     if (!this.fromDate && !this.toDate) {
@@ -27,7 +27,6 @@ export class DateRangePicker {
       this.fromDate = date;
     }
 
-    // 🔥 YEH ADD KAR
     if (this.fromDate && this.toDate) {
       this.dateSelected.emit({
         from: this.fromDate,

@@ -19,6 +19,7 @@ import {
   SelectedBeneficiary,
   SelectedSubEntity,
   SubEntity,
+  FocusGroupState,
 } from '../../datatype';
 import { Input } from '@angular/core';
 
@@ -46,6 +47,11 @@ export class FocusGroupsComponent implements OnInit {
   handleOutsideClick(event: MouseEvent) {
     if (!this.issueContainer) return;
   }
+
+  originalState: FocusGroupState = {
+    beneficiaries: [],
+    entities: {},
+  };
 
   allSubEntities: Record<number, SubEntity[]> = {};
   subEntitiesList: SubEntity[] = [];
@@ -173,7 +179,7 @@ export class FocusGroupsComponent implements OnInit {
         this.focusGroupKeyDropdowns.entities.data = mapped;
 
         if (this.grantId) {
-          this.loadSelectedFocusGroups(this.grantId); // 🔥 yaha
+          this.loadSelectedFocusGroups(this.grantId);
         }
       },
     });
@@ -214,24 +220,13 @@ export class FocusGroupsComponent implements OnInit {
               .map((x) => x.toLowerCase().trim())
               .includes(item.item_text.toLowerCase().trim()),
           );
+
+        // ✅ FIX: yahi set karo (IMPORTANT)
+        this.originalState.entities = JSON.parse(JSON.stringify(this.selectedSubEntities));
       },
     });
 
-    this.focusGroupKeyDropdowns.entities.selected.forEach((entity) => {
-      const entId = entity.item_id;
-
-      this.api.getSubEntities(entId).subscribe({
-        next: (res: GetSubEntitiesResponse) => {
-          this.allSubEntities[entId] = res.subEntities || [];
-
-          // agar first entity hai to UI open bhi karo
-          if (!this.activeEntityForSubGrid) {
-            this.activeEntityForSubGrid = entity.item_text;
-            this.subEntitiesList = res.subEntities || [];
-          }
-        },
-      });
-    });
+    // subEntities load same rahega
   }
 
   loadSelectedBeneficiaries(grantId: number) {
@@ -247,6 +242,7 @@ export class FocusGroupsComponent implements OnInit {
               .map((x) => x.toLowerCase().trim())
               .includes(item.item_text.toLowerCase().trim()),
           );
+        this.originalState.beneficiaries = [...this.savedBeneficiaries];
       },
     });
   }
@@ -375,6 +371,11 @@ export class FocusGroupsComponent implements OnInit {
 
   removeSubEntity(entity: string, sub: string) {
     this.selectedSubEntities[entity] = this.selectedSubEntities[entity].filter((s) => s !== sub);
+
+    if (this.selectedSubEntities[entity].length === 0) {
+      delete this.selectedSubEntities[entity];
+      this.savedEntities = this.savedEntities.filter((e) => e !== entity);
+    }
   }
 
   saveFocusGroup(type: string) {
@@ -434,10 +435,19 @@ export class FocusGroupsComponent implements OnInit {
   // }
 
   saveAllFocusGroup() {
+    if (!this.hasChanges()) {
+      console.log('❌ No changes detected — skipping API');
+      return;
+    }
+
     this.saveSubEntitiesToApi();
     this.saveBeneficiariesToApi();
 
-    console.log('ALL SAVED SUCCESS');
+    // ✅ Update original after save
+    this.originalState.entities = JSON.parse(JSON.stringify(this.selectedSubEntities));
+    this.originalState.beneficiaries = [...this.savedBeneficiaries];
+
+    console.log('✅ Changes saved successfully');
   }
 
   clearFocusGroup() {
@@ -471,9 +481,6 @@ export class FocusGroupsComponent implements OnInit {
       const entId = entityObj.item_id;
       const subList = this.selectedSubEntities[entityName] || [];
 
-      // 🔥 skip empty
-      if (subList.length === 0) return;
-
       subList.forEach((subName) => {
         const subObj = this.allSubEntities[entId]?.find((s) => s.subEntName === subName);
 
@@ -488,22 +495,19 @@ export class FocusGroupsComponent implements OnInit {
       });
     });
 
-    // 🔥 CRITICAL FIX
-    if (rows.length === 0) {
-      console.log('⚠️ No data to save — skipping API call');
-      return;
-    }
-
+    // ✅ ALWAYS CALL API (even if empty)
     const payload = {
       grantIndex: String(this.grantId),
       grantSubEntities: rows,
     };
 
+    console.log('📤 SubEntities Payload:', payload);
+
     this.api.insertSubEntities(payload).subscribe({
-      next: (res) => console.log('Saved', res),
+      next: (res) => console.log('✅ SubEntities Saved', res),
     });
   }
-  
+
   saveBeneficiariesToApi() {
     const rows: InsertBeneficiaryRow[] = this.focusGroupKeyDropdowns.beneficiaries.selected.map(
       (item) => ({
@@ -520,5 +524,15 @@ export class FocusGroupsComponent implements OnInit {
     this.api.insertBeneficiaries(payload).subscribe({
       next: (res) => console.log('Saved', res),
     });
+  }
+
+  hasChanges(): boolean {
+    const currentEntities = JSON.stringify(this.selectedSubEntities);
+    const originalEntities = JSON.stringify(this.originalState.entities);
+
+    const currentBeneficiaries = JSON.stringify(this.savedBeneficiaries);
+    const originalBeneficiaries = JSON.stringify(this.originalState.beneficiaries);
+
+    return currentEntities !== originalEntities || currentBeneficiaries !== originalBeneficiaries;
   }
 }
