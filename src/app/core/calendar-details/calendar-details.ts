@@ -28,6 +28,7 @@ export class CalendarDetails {
   @ViewChild('issueContainer') issueContainer!: ElementRef;
   @ViewChild('dropdownContainer') dropdownContainer!: ElementRef;
   @Input() data: GrantDetail | null = null;
+  
 
   key: any;
 
@@ -98,11 +99,20 @@ export class CalendarDetails {
     this.activeItem = item;
   }
 
-  ngOnChanges(changes: SimpleChanges) {
-    console.log('DATA RECEIVED', this.data);
+  ngOnInit(): void {
+    if (this.data) {
+      this.fillForm(this.data);
+    }
+  }
 
-    if (changes['data']?.currentValue) {
-      this.fillForm(changes['data'].currentValue);
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['data']) {
+      const currentData = changes['data'].currentValue;
+      const previousData = changes['data'].previousValue;
+      // check if valid data hai
+      if (currentData && currentData !== previousData) {
+        this.fillForm(currentData);
+      }
     }
   }
 

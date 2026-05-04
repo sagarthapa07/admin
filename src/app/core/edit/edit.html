@@ -1,4 +1,5 @@
 <app-header></app-header>
+
 <section class="header-section">
   <div class="row">
     <div class="col-lg-6">
@@ -9,34 +10,45 @@
       <button
         class="btn"
         *ngFor="let item of menuItems"
-        [class.active]="activeItem === item"
-        (click)="setActive(item)"
+        [class.active]="activeItem === item.id"
+        (click)="setActive(item.id)"
       >
-        {{ item }}
+        {{ item.label }}
       </button>
     </div>
   </div>
-  <div *ngIf="activeItem === 'Calender Details' && grantData">
-    <app-calendar-details [data]="grantData"></app-calendar-details>
-  </div>
 
-  <div *ngIf="activeItem === 'Geo Location' && grantData">
-    <app-geo-location [grantId]="grantData.id"></app-geo-location>
+  <div *ngIf="isLoading" class="component-loader">
+    <span class="loader-dot"></span>
+    Loading data...
   </div>
+  <div>
+    <div *ngIf="activeItem === 1 && grantData">
+      <app-calendar-details [data]="grantData"></app-calendar-details>
+    </div>
 
-  <div *ngIf="activeItem === 'Focus Areas' && grantData">
-    <app-focus-area [grantId]="grantData.id"></app-focus-area>
-  </div>
+    <app-geo-location *ngIf="grantData" [hidden]="activeItem !== 2" [grantId]="grantData.id">
+    </app-geo-location>
 
-  <div *ngIf="activeItem === 'Focus Groups' && grantData">
-    <app-focus-groups [grantId]="grantData.id"></app-focus-groups>
-  </div>
+    <app-focus-area
+      *ngIf="grantData"
+      [hidden]="activeItem !== 3"
+      [grantId]="grantData.id"
+    ></app-focus-area>
 
-  <div *ngIf="activeItem === 'Counties'">
-    <app-counties></app-counties>
-  </div>
+    <app-focus-groups
+      *ngIf="grantData"
+      [hidden]="activeItem !== 4"
+      [grantId]="grantData.id"
+    ></app-focus-groups>
 
-  <div *ngIf="activeItem === 'Seo/Social Media'">
-    <app-seo-social></app-seo-social>
+
+    <div *ngIf="activeItem === 5">
+      <app-counties></app-counties>
+    </div>
+
+    <div *ngIf="activeItem === 6">
+      <app-seo-social></app-seo-social>
+    </div>
   </div>
 </section>

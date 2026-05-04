@@ -4,17 +4,17 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { IDropdownSettings, NgMultiSelectDropDownModule } from 'ng-multiselect-dropdown';
 import { Api } from '../Services/api';
+import { SimpleChanges } from '@angular/core';
 import {
   DropdownItem,
   SaveCitiesPayload,
-  SaveCityPayload,
   SaveInsularPayload,
   SaveStatesPayload,
   SaveTownshipPayload,
 } from '../../datatype';
 import { Input } from '@angular/core';
 import { forkJoin } from 'rxjs';
-import { ApiSuccessResponse } from '../../datatype';
+import { ChangeDetectorRef } from '@angular/core';
 
 type GeoKey = 'cities' | 'township' | 'insular' | 'states';
 
@@ -33,6 +33,7 @@ export class GeoLocationComponent implements OnInit {
   constructor(
     private router: Router,
     private api: Api,
+    private cd: ChangeDetectorRef,
   ) {}
 
   showGeoModal: boolean = false;
@@ -100,123 +101,90 @@ export class GeoLocationComponent implements OnInit {
   };
 
   geoKeys: GeoKey[] = [];
-
   ngOnInit(): void {
-    this.loadGeoData(() => {
-      if (this.grantId) {
-        this.loadSelectedGeoData(this.grantId);
-      }
-    });
+    console.log('INIT GEO', this.grantId);
+  }
 
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes['grantId']?.currentValue) {
+      this.loadGeoData(() => {
+        if (this.grantId) {
+          this.loadSelectedGeoData(this.grantId);
+        }
+      });
+    }
     this.geoKeys = Object.keys(this.geoDropdowns) as GeoKey[];
   }
+
   loadGeoData(callback?: () => void) {
-    let completed = 0;
-
-    const done = () => {
-      completed++;
-      if (completed === 4 && callback) {
-        callback();
-      }
-    };
-
-    // Cities
-    this.api.getCities().subscribe((res) => {
-      this.geoDropdowns.cities.data = res.usCities.map((c) => ({
+    forkJoin({
+      cities: this.api.getCities(),
+      states: this.api.getStates(),
+      township: this.api.getTownShips(),
+      insular: this.api.getInsularAreas(),
+    }).subscribe((res) => {
+      this.geoDropdowns.cities.data = res.cities.usCities.map((c) => ({
         item_id: c.cityIndex,
         item_text: c.cityName.trim(),
       }));
-      done();
-    });
 
-    // States
-    this.api.getStates().subscribe((res) => {
-      this.geoDropdowns.states.data = res.usStates.map((s) => ({
+      this.geoDropdowns.states.data = res.states.usStates.map((s) => ({
         item_id: s.stateIndex,
         item_text: s.stateName.trim(),
       }));
-      done();
-    });
 
-    // Township
-    this.api.getTownShips().subscribe((res) => {
-      this.geoDropdowns.township.data = res.usTownships.map((t) => ({
+      this.geoDropdowns.township.data = res.township.usTownships.map((t) => ({
         item_id: t.townshipIndex,
         item_text: t.townshipName.trim(),
       }));
-      done();
-    });
 
-    // Insular
-    this.api.getInsularAreas().subscribe((res) => {
-      this.geoDropdowns.insular.data = res.usInsularAreas.map((i) => ({
+      this.geoDropdowns.insular.data = res.insular.usInsularAreas.map((i) => ({
         item_id: i.areaIndex,
         item_text: i.areaName.trim(),
       }));
-      done();
+
+      if (callback) callback();
     });
   }
 
   loadSelectedGeoData(grantId: number) {
-    console.log('Grant ID:', grantId);
-
     // Cities
-    this.api.getSelectedCities(grantId).subscribe({
-      next: (res: any) => {
-        console.log('Cities Response:', res);
-
-        this.geoDropdowns.cities.selected =
-          res.tempUSGrantCities?.map((c: any) => ({
-            item_id: c.cityIndex,
-            item_text: c.cityName.trim(),
-          })) || [];
-
-        console.log('Cities Selected:', this.geoDropdowns.cities.selected);
-      },
-      error: (err) => console.error('Cities Error:', err),
+    this.api.getSelectedCities(grantId).subscribe((res: any) => {
+      this.geoDropdowns.cities.selected =
+        res.tempUSGrantCities?.map((c: any) => ({
+          item_id: c.cityIndex,
+          item_text: c.cityName.trim(),
+        })) || [];
     });
 
     // States
-    this.api.getSelectedStates(grantId).subscribe({
-      next: (res: any) => {
-        console.log('States Response:', res);
-
-        this.geoDropdowns.states.selected =
-          res.tempUSGrantStates?.map((s: any) => ({
-            item_id: s.stateIndex,
-            item_text: s.stateName.trim(),
-          })) || [];
-
-        console.log('States Selected:', this.geoDropdowns.states.selected);
-      },
-      error: (err) => console.error('States Error:', err),
+    this.api.getSelectedStates(grantId).subscribe((res: any) => {
+      this.geoDropdowns.states.selected =
+        res.tempUSGrantStates?.map((s: any) => ({
+          item_id: s.stateIndex,
+          item_text: s.stateName.trim(),
+        })) || [];
     });
 
     // Township
-    this.api.getSelectedTownships(grantId).subscribe({
-      next: (res: any) => {
-        console.log('Township Response:', res);
-
-        this.geoDropdowns.township.selected =
-          res.tempData?.map((t: any) => ({
-            item_id: t.townshipIndex,
-            item_text: t.townshipName.trim(),
-          })) || [];
-      },
+    this.api.getSelectedTownships(grantId).subscribe((res: any) => {
+      this.geoDropdowns.township.selected =
+        res.tempData?.map((t: any) => ({
+          item_id: t.townshipIndex,
+          item_text: t.townshipName.trim(),
+        })) || [];
     });
 
     // Insular
-    this.api.getSelectedInsular(grantId).subscribe({
-      next: (res: any) => {
-        console.log('Insular Response:', res);
-
-        this.geoDropdowns.insular.selected =
-          res.tempData?.map((i: any) => ({
-            item_id: i.areaIndex,
-            item_text: i.areaName.trim(),
-          })) || [];
-      },
+    this.api.getSelectedInsular(grantId).subscribe((res: any) => {
+      this.geoDropdowns.insular.selected =
+        res.tempData?.map((i: any) => ({
+          item_id: i.areaIndex,
+          item_text: i.areaName.trim(),
+        })) || [];
     });
+
+    this.cd.detectChanges();
   }
 
   goToFocusAreas() {

@@ -158,7 +158,7 @@
 .sub-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 5px 10px; 
+  gap: 5px 10px;
   margin-top: 10px;
 }
 
@@ -171,18 +171,19 @@
   font-size: 14px;
 }
 
-/* Tablet */
 @media (max-width: 992px) {
   .sub-grid {
     grid-template-columns: repeat(3, 1fr);
   }
 }
 
-/* Mobile */
 @media (max-width: 576px) {
   .sub-grid {
     grid-template-columns: repeat(1, 1fr);
   }
 }
 
-
+:host ::ng-deep .multiselect-item-checkbox,
+:host ::ng-deep .selected-item {
+  max-width: none !important;
+}

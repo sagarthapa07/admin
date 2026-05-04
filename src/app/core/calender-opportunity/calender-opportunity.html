@@ -100,28 +100,40 @@
         </thead>
 
         <tbody>
-          <tr *ngFor="let item of grants">
-            <td>
-              <label class="custom-checkbox">
-                <input type="checkbox" [(ngModel)]="item.selected" (change)="onItemChange()" />
-              </label>
-            </td>
-            <td class="id-text">{{ item.grantTitle }}</td>
-            <td>{{ item.postDate | date: 'dd MMM yyyy' }}</td>
-            <td>{{ item.deadLineDate | date: 'dd MMM yyyy' }}</td>
-            <td>{{ item.viewCount }}</td>
-            <td>
-              <span class="status" [ngClass]="item.status === 'Published' ? 'paid' : 'pending'">
-                {{ item.status }}
-              </span>
-            </td>
-            <td class="icon-cell" (click)="goToEdit(item.grantIndex)">
-              <i class="bi bi-pencil-square"></i>
-            </td>
-            <td class="icon-cell">
-              <i class="bi bi-copy"></i>
-            </td>
-          </tr>
+          <!-- 🔄 LOADING -->
+          <ng-container *ngIf="isLoading">
+            <tr *ngFor="let i of [1, 2, 3, 4, 5]">
+              <td colspan="8">
+                <div class="skeleton-box"></div>
+              </td>
+            </tr>
+          </ng-container>
+
+          <!-- ✅ DATA -->
+          <ng-container *ngIf="!isLoading">
+            <tr *ngFor="let item of grants">
+              <td>
+                <label class="custom-checkbox">
+                  <input type="checkbox" [(ngModel)]="item.selected" (change)="onItemChange()" />
+                </label>
+              </td>
+              <td class="id-text">{{ item.grantTitle }}</td>
+              <td>{{ item.postDate | date: 'dd MMM yyyy' }}</td>
+              <td>{{ item.deadLineDate | date: 'dd MMM yyyy' }}</td>
+              <td>{{ item.viewCount }}</td>
+              <td>
+                <span class="status" [ngClass]="item.status === 'Published' ? 'paid' : 'pending'">
+                  {{ item.status }}
+                </span>
+              </td>
+              <td class="icon-cell" (click)="goToEdit(item.grantIndex)">
+                <i class="bi bi-pencil-square"></i>
+              </td>
+              <td class="icon-cell">
+                <i class="bi bi-copy"></i>
+              </td>
+            </tr>
+          </ng-container>
         </tbody>
       </table>
     </div>

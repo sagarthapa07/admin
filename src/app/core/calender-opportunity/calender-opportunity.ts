@@ -1,5 +1,5 @@
 import { ChangeDetectorRef, Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, NgFor } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { NgbDate, NgbDateParserFormatter, NgbDateStruct } from '@ng-bootstrap/ng-bootstrap';
 import { NgbDatepickerModule } from '@ng-bootstrap/ng-bootstrap';
@@ -11,7 +11,7 @@ import { DateRangePicker } from '../../shared/component/date-range-picker/date-r
 
 @Component({
   selector: 'app-calender-opportunity',
-  imports: [FormsModule, NgbDatepickerModule, CommonModule, Header, RouterLink, DateRangePicker],
+  imports: [FormsModule, NgbDatepickerModule, CommonModule, Header, RouterLink, DateRangePicker,NgFor],
   templateUrl: './calender-opportunity.html',
   styleUrl: './calender-opportunity.scss',
 })
@@ -29,10 +29,10 @@ export class CalenderOpportunity {
   totalCount = 0;
   searchHistory: string[] = [];
   showSuggestions = false;
+  isLoading = false;
 
   selectAll = false;
   hoveredDate: NgbDate | null = null;
-  
 
   @HostListener('document:click', ['$event'])
   onClickOutside(event: any) {
@@ -56,6 +56,8 @@ export class CalenderOpportunity {
     this.searchHistory = data ? JSON.parse(data) : [];
   }
   getData() {
+    this.isLoading = true; // 🔄 start loader
+
     const payload = {
       memberId: '',
       pageIndex: this.pageIndex,
@@ -71,19 +73,16 @@ export class CalenderOpportunity {
 
     this.api.getGrants(payload).subscribe({
       next: (res) => {
-        console.log('API RESPONSE', res);
-
         this.grants = res.pageUSGrants || [];
         this.totalCount = res.recCount || 0;
 
         this.selectAll = false;
-        this.grants.forEach((item) => {
-          item.selected = false;
-        });
-        this.cdr.detectChanges();
+        this.grants.forEach((item) => (item.selected = false));
+
+        this.isLoading = false; // ✅ stop loader
       },
-      error: (err) => {
-        console.log('API ERROR', err);
+      error: () => {
+        this.isLoading = false; // ❌ error pe bhi band
       },
     });
   }

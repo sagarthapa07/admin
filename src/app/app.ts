@@ -61,13 +61,14 @@ import {
   type EditorConfig
 } from 'ckeditor5';
 import {ViewEncapsulation} from'@angular/core';
+import { Loader } from './shared/component/loader/loader';
 
 
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CKEditorModule, FormsModule, RouterOutlet],
+  imports: [CKEditorModule, FormsModule, RouterOutlet, Loader],
   templateUrl: './app.html',
   encapsulation: ViewEncapsulation.None,
   styleUrl:'./app.scss'
