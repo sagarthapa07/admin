@@ -81,7 +81,7 @@
           </div>
 
           <!-- DATA -->
-          <ng-container *ngFor="let entity of savedEntities">
+          <ng-container *ngFor="let entity of objectKeys(selectedSubEntities)">
             <!-- ENTITY COLUMN -->
             <div class="col-md-3 col-12 mt-3">
               <span class="chip entity-chip">
@@ -89,6 +89,7 @@
                 <span class="remove" (click)="removeEntity(entity)"> × </span>
               </span>
             </div>
+
             <!-- SUB ENTITY COLUMN -->
             <div class="col-md-9 col-12 mt-3">
               <span class="chip" *ngFor="let sub of selectedSubEntities[entity]">
