@@ -1,4 +1,17 @@
 <section>
+  <app-alert-message
+    *ngIf="successMessage"
+    [type]="'success'"
+    [message]="successMessage"
+    (close)="successMessage = ''"
+  ></app-alert-message>
+
+  <app-alert-message
+    *ngIf="errorMessage"
+    [type]="'error'"
+    [message]="errorMessage"
+    (close)="errorMessage = ''"
+  ></app-alert-message>
   <div class="mt-4">
     <h5>Select Focus Groups</h5>
     <hr />
@@ -44,7 +57,7 @@
           [data]="focusGroupKeyDropdowns.entities.data"
           [(ngModel)]="focusGroupKeyDropdowns.entities.selected"
           (onSelect)="onEntityChange()"
-          (onDeSelect)="onEntityChange()"
+          (onDeSelect)="onEntityDeSelect($event)"
           [ngModelOptions]="{ standalone: true }"
           name="entities"
         >

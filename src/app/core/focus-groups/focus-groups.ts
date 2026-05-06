@@ -1,12 +1,4 @@
-import {
-  Component,
-  OnInit,
-  HostListener,
-  ElementRef,
-  ViewChild,
-  Inject,
-  OnChanges,
-} from '@angular/core';
+import { Component, HostListener, ElementRef, ViewChild, Inject, OnChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -14,7 +6,8 @@ import { IDropdownSettings, NgMultiSelectDropDownModule } from 'ng-multiselect-d
 import { PLATFORM_ID } from '@angular/core';
 import { Api } from '../Services/api';
 import { forkJoin } from 'rxjs';
-import { Subject, takeUntil } from 'rxjs';
+import { Subject } from 'rxjs';
+
 import {
   Beneficiary,
   DropdownItem,
@@ -22,8 +15,6 @@ import {
   GetBeneficiariesResponse,
   GetSelectedBeneficiariesResponse,
   GetSelectedSubEntitiesResponse,
-  GetSubEntitiesResponse,
-  InsertBeneficiariesPayload,
   InsertBeneficiaryRow,
   InsertSubEntityRow,
   SelectedBeneficiary,
@@ -32,13 +23,14 @@ import {
   FocusGroupState,
 } from '../../datatype';
 import { Input } from '@angular/core';
+import { AlertMessage } from '../../shared/component/alert-message/alert-message';
 
 @Component({
   selector: 'app-focus-groups',
   standalone: true,
-  imports: [CommonModule, FormsModule, NgMultiSelectDropDownModule],
+  imports: [CommonModule, FormsModule, NgMultiSelectDropDownModule, AlertMessage],
   templateUrl: './focus-groups.html',
-  styleUrl: './focus-groups.scss',
+  styleUrls: ['./focus-groups.scss'],
 })
 export class FocusGroupsComponent implements OnChanges {
   objectKeys = Object.keys;
@@ -73,6 +65,11 @@ export class FocusGroupsComponent implements OnChanges {
   showPasteModal = false;
   pasteText = '';
   isLoading = true;
+  previousEntity: string | null = null;
+
+  successMessage = '';
+  errorMessage = '';
+
   constructor(
     private fb: FormBuilder,
     private router: Router,
@@ -149,7 +146,9 @@ export class FocusGroupsComponent implements OnChanges {
     idField: 'item_id',
     textField: 'item_text',
     allowSearchFilter: true,
-    closeDropDownOnSelection: true,
+    closeDropDownOnSelection: false,
+    enableCheckAll: false,
+    itemsShowLimit: 3,
   };
 
   savedEntities: string[] = [];
@@ -408,25 +407,45 @@ export class FocusGroupsComponent implements OnChanges {
     if (!selected.length) {
       this.activeEntityForSubGrid = null;
       this.subEntitiesList = [];
+
       return;
     }
 
-    const entity = selected[selected.length - 1];
+    const currentEntity = selected[selected.length - 1];
 
-    const entId = entity.item_id;
-    const entityName = entity.item_text;
+    const currentEntityName = currentEntity.item_text;
 
-    this.activeEntityForSubGrid = entityName;
+    // ✅ CHECK PREVIOUS ENTITY
+    if (this.previousEntity) {
+      const previousSubEntities = this.selectedSubEntities[this.previousEntity] || [];
 
-    if (!this.selectedSubEntities[entityName]) {
-      this.selectedSubEntities[entityName] = [];
+      // agar previous entity me koi sub entity nahi
+      if (previousSubEntities.length === 0) {
+        // dropdown se remove
+        this.focusGroupKeyDropdowns.entities.selected =
+          this.focusGroupKeyDropdowns.entities.selected.filter(
+            (e) => e.item_text !== this.previousEntity,
+          );
+
+        // object cleanup
+        delete this.selectedSubEntities[this.previousEntity];
+      }
     }
 
+    // active entity update
+    this.previousEntity = currentEntityName;
+
+    this.activeEntityForSubGrid = currentEntityName;
+
+    const entId = currentEntity.item_id;
+
+    // load sub entities
     if (this.allSubEntities[entId]) {
       this.subEntitiesList = this.allSubEntities[entId];
     } else {
       this.api.getSubEntities(entId).subscribe((res) => {
         this.subEntitiesList = res.subEntities || [];
+
         this.allSubEntities[entId] = res.subEntities || [];
       });
     }
@@ -437,15 +456,40 @@ export class FocusGroupsComponent implements OnChanges {
       this.selectedSubEntities[entity] = [];
     }
 
+    // ✅ CHECK
     if (checked) {
       if (!this.selectedSubEntities[entity].includes(sub)) {
         this.selectedSubEntities[entity].push(sub);
       }
-    } else {
-      this.selectedSubEntities[entity] = this.selectedSubEntities[entity].filter((s) => s !== sub);
-    }
 
-    this.syncEntityDropdown(entity);
+      // entity ko dropdown me add karo
+      const entityObj = this.focusGroupKeyDropdowns.entities.data.find(
+        (e) => e.item_text === entity,
+      );
+
+      const exists = this.focusGroupKeyDropdowns.entities.selected.find(
+        (e) => e.item_text === entity,
+      );
+
+      if (entityObj && !exists) {
+        this.focusGroupKeyDropdowns.entities.selected = [
+          ...this.focusGroupKeyDropdowns.entities.selected,
+          entityObj,
+        ];
+      }
+    } else {
+      // uncheck subentity
+      this.selectedSubEntities[entity] = this.selectedSubEntities[entity].filter((s) => s !== sub);
+
+      // ✅ agar koi sub entity nahi bachi
+      if (this.selectedSubEntities[entity].length === 0) {
+        delete this.selectedSubEntities[entity];
+
+        // dropdown se entity remove
+        this.focusGroupKeyDropdowns.entities.selected =
+          this.focusGroupKeyDropdowns.entities.selected.filter((item) => item.item_text !== entity);
+      }
+    }
   }
   syncEntityDropdown(entityName: string) {
     const entityObj = this.focusGroupKeyDropdowns.entities.data.find(
@@ -519,18 +563,107 @@ export class FocusGroupsComponent implements OnChanges {
   }
 
   saveAllFocusGroup() {
-    if (!this.hasChanges()) {
-      console.log('❌ No changes detected — skipping API');
-      return;
-    }
-    this.saveSubEntitiesToApi();
-    this.saveBeneficiariesToApi();
-    this.originalState.entities = JSON.parse(JSON.stringify(this.selectedSubEntities));
-    this.originalState.beneficiaries = [...this.savedBeneficiaries];
+    this.successMessage = '';
+    this.errorMessage = '';
 
-    console.log('✅ C hanges saved successfully');
+    const subEntityPayload = this.getSubEntitiesPayload();
+
+    const beneficiariesPayload = this.getBeneficiariesPayload();
+
+    console.log('SAVE START');
+
+    // FIRST API
+    this.api.insertSubEntities(subEntityPayload).subscribe({
+      next: (subRes) => {
+        console.log('SUB ENTITY SAVED', subRes);
+
+        // SECOND API
+        this.api.insertBeneficiaries(beneficiariesPayload).subscribe({
+          next: (beneficiaryRes) => {
+            console.log('BENEFICIARY SAVED', beneficiaryRes);
+
+            // SUCCESS MESSAGE
+            this.successMessage =
+              'Your entities, issues and beneficiaries have been saved successfully.';
+
+            // update original state
+            this.originalState.entities = JSON.parse(JSON.stringify(this.selectedSubEntities));
+
+            this.originalState.beneficiaries = [...this.savedBeneficiaries];
+
+            setTimeout(() => {
+              this.successMessage = '';
+            }, 4000);
+          },
+
+          error: (err) => {
+            console.log('BENEFICIARY ERROR', err);
+
+            this.errorMessage = err?.error?.message || 'Beneficiary save failed';
+
+            setTimeout(() => {
+              this.errorMessage = '';
+            }, 5000);
+          },
+        });
+      },
+
+      error: (err) => {
+        console.log('SUB ENTITY ERROR', err);
+
+        this.errorMessage = err?.error?.message || 'Sub Entity save failed';
+
+        setTimeout(() => {
+          this.errorMessage = '';
+        }, 5000);
+      },
+    });
+  }
+  getSubEntitiesPayload() {
+    const rows: InsertSubEntityRow[] = [];
+
+    Object.keys(this.selectedSubEntities).forEach((entityName) => {
+      const entityObj = this.focusGroupKeyDropdowns.entities.data.find(
+        (e) => e.item_text === entityName,
+      );
+
+      if (!entityObj) return;
+
+      const entId = entityObj.item_id;
+
+      const subList = this.selectedSubEntities[entityName];
+
+      subList.forEach((subName) => {
+        const subObj = this.allSubEntities[entId]?.find((s) => s.subEntName === subName);
+
+        rows.push({
+          entIndex: entId,
+          entitiyName: entityName,
+          subEntIndex: subObj?.subEntIndex ?? 0,
+          subEntName: subName,
+        });
+      });
+    });
+
+    return {
+      grantIndex: String(this.grantId ?? ''),
+      grantSubEntities: rows,
+    };
   }
 
+  getBeneficiariesPayload() {
+    const rows: InsertBeneficiaryRow[] = this.focusGroupKeyDropdowns.beneficiaries.selected.map(
+      (item) => ({
+        beneficiaryIndex: item.item_id,
+        beneficiaryName: item.item_text,
+      }),
+    );
+
+    return {
+      grantIndex: String(this.grantId),
+      grantBeneficiaries: rows,
+    };
+  }
   clearFocusGroup() {
     this.selectedSubEntities = {};
     this.savedEntities = [];
@@ -570,7 +703,7 @@ export class FocusGroupsComponent implements OnChanges {
 
     console.log('📤 FINAL Payload:', payload);
 
-    // 🔥🔥🔥 YE MISSING THA
+    //  YE MISSING THA
     this.api.insertSubEntities(payload).subscribe({
       next: (res) => console.log(' SubEntities Saved', res),
       error: (err) => console.log(' Error', err),
@@ -590,7 +723,7 @@ export class FocusGroupsComponent implements OnChanges {
       grantBeneficiaries: rows,
     };
 
-    console.log('📤 FINAL Beneficiaries Payload:', payload);
+    console.log('FINAL Beneficiaries Payload:', payload);
 
     this.api.insertBeneficiaries(payload).subscribe({
       next: (res) => console.log('✅ Saved', res),
@@ -610,31 +743,55 @@ export class FocusGroupsComponent implements OnChanges {
 
   hasChanges(): boolean {
     const currentEntities = this.normalize(this.selectedSubEntities);
+
     const originalEntities = this.normalize(this.originalState.entities);
 
-    const currentBeneficiaries = [...this.savedBeneficiaries].sort();
-    const originalBeneficiaries = [...this.originalState.beneficiaries].sort();
+    const currentBeneficiaries = JSON.stringify([...this.savedBeneficiaries].sort());
 
-    return (
-      currentEntities !== originalEntities ||
-      JSON.stringify(currentBeneficiaries) !== JSON.stringify(originalBeneficiaries)
-    );
+    const originalBeneficiaries = JSON.stringify([...this.originalState.beneficiaries].sort());
+
+    return currentEntities !== originalEntities || currentBeneficiaries !== originalBeneficiaries;
   }
 
-  onEntityDeSelect(item: DropdownItem) {
+  onEntityDeSelect(item: any) {
     const entityName = item.item_text;
 
-    const hasSubEntities =
-      this.selectedSubEntities[entityName] && this.selectedSubEntities[entityName].length > 0;
-    if (hasSubEntities) {
-      console.log('Cannot remove entity, sub-entities exist');
+    const subEntities = this.selectedSubEntities[entityName] || [];
+
+    // ✅ if sub entities exist
+    if (subEntities.length > 0) {
+      // prevent deselect
+      const originalEntity = this.focusGroupKeyDropdowns.entities.data.find(
+        (e) => e.item_id === item.item_id,
+      );
+
+      if (!originalEntity) return;
+
+      // IMPORTANT
+      // selected ko completely recreate karo
       this.focusGroupKeyDropdowns.entities.selected = [
-        ...this.focusGroupKeyDropdowns.entities.selected,
-        item,
+        ...this.focusGroupKeyDropdowns.entities.selected.filter((e) => e.item_id !== item.item_id),
+        originalEntity,
       ];
+
+      // reopen subgrid
+      this.activeEntityForSubGrid = entityName;
+
+      // reload sub entities
+      if (this.allSubEntities[item.item_id]) {
+        this.subEntitiesList = [...this.allSubEntities[item.item_id]];
+      } else {
+        this.api.getSubEntities(item.item_id).subscribe((res) => {
+          this.subEntitiesList = res.subEntities || [];
+
+          this.allSubEntities[item.item_id] = res.subEntities || [];
+        });
+      }
 
       return;
     }
+
+    // allow remove
     delete this.selectedSubEntities[entityName];
   }
 }
